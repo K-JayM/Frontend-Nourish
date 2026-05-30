@@ -1,0 +1,162 @@
+html, body, main{
+    margin: 0;
+    height: 100%;
+    background-color: #eeecd4;
+    place-content: center;
+    font-family:Segoe UI;
+}
+div{display:block;
+    margin: auto;
+    padding: 0;
+    width: 80vw;
+    height: 80vh;
+    border-radius: 10vw;
+   background-color: #FFFCD6;
+   place-content: center;
+   box-shadow: 10px 10px 20px darkgray;}
+
+div>section{
+    position: relative;
+    float: left;
+    margin: 0;
+    padding: 0;
+    width: 50%;
+    text-align: center;
+}
+   div>section>img{
+    position: relative;
+    width: 70%;
+
+}
+
+form{
+    position: relative;
+    right: 5%;
+    top: 15%;
+    float: right;
+    padding: 0;
+    width: 40%;
+}
+
+
+
+form>label, input{
+    display: block;
+    text-align: center;
+    font-size: 3vh;
+  
+ 
+}
+
+
+input{
+    height: 5vh;
+    width: 100%;
+    border: 2px solid #3f642a;
+    border-radius: 20px;
+    box-shadow: 3px 3px 2px lightgrey;
+    font-size: 2vh;
+}
+
+input[type=submit]{
+    width:20%;
+    float: right;
+    background-color: #3f642a;
+    color: white;
+    margin:  2vh 0;
+}
+input[type=submit]:hover{
+    background-color: #345422;
+
+}
+
+#message, #failed_message{
+    font-size: 100%;
+    margin: 5% 0 0 0;
+}
+
+#message>a{
+    color: #3f642a;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#failed_message{
+    display: none;
+    color: #b11111;
+    font-weight: bold;
+}
+
+@media(max-width: 768px){
+
+    div{
+        display: block;
+        height: 100%;
+        width: 90%;
+        place-items: center;
+        margin: auto;
+    }
+
+    div>section{
+    position: static;
+    float: none;
+    padding: 0;
+    width: 50%;
+    text-align: center;
+}
+       div>section>img{
+    
+    width: 50%;
+
+}
+
+
+
+form{
+    position: static;
+    float: none;
+    padding: 0;
+    margin-top: 10vw;
+    width: 80%;
+   
+}
+
+     #message, #failed_message{
+    font-size: 3vw;
+}
+ #message{
+    margin-top: 10%;
+}
+#message>a{
+    white-space: pre;
+}
+    
+
+    input{
+    height: 5vh;
+    width: 100%;
+    border: 2px solid #3f642a;
+    border-radius: 20px;
+    box-shadow: 3px 3px 2px lightgrey;
+    font-size: 2vh;
+  
+}
+    
+
+    input[type=submit]{
+        margin: 10% 0;
+        width: 50%;
+    float: none;
+    place-self: center;
+    
+
+}
+}
+
+
+
+
+
+
+
+
