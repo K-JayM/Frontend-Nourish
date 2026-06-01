@@ -1,0 +1,78 @@
+html, body, main{
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #eeecd4;
+    font-family:Segoe UI;
+    display: inline-block;
+}
+
+h2{
+    background-color: #3f642a;
+    margin: 0;
+    padding: 1% 5%;
+}
+
+#sidePanel{
+    margin-top: 5px;
+    background-color: #3f642a;
+    width: 30%;
+    height: 100%;
+    right: 0;
+    position: absolute;
+    border-radius: 20px 0 0 20px;
+    color: white;
+}
+
+#sidePanel h3{
+    margin: 2%;
+}
+
+#invHead{
+    background-color: #3f642a;
+    width: 60%;
+    height: 10%;
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    justify-content: space-evenly;
+    color: white;
+}
+
+.invLine{
+    background-color: #8bb574;
+    width: 60%;
+    height: 10%;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-evenly;
+    margin: 1% 0;
+    color: white;
+}
+
+p{
+    width: 15%;
+    text-align: center;
+}
+
+button{
+    width: 50%;
+    text-align: center;
+}
+
+form{
+    display: grid;
+}
+
+input{
+    width: 50%;
+    margin: 1% 25%;
+    color: white;
+    background-color: #8bb574;
+    border-color: #3f642a;
+}
+
+label{
+    margin: 0 25%;
+}
+
+
