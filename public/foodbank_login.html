@@ -1,36 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Nourish: Foodbank Log in</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="css/foodbank_login.css">
+
+    <script type="module" src="javascript/foodbank_login.js" defer></script>
 
     <meta charset="UTF-8">
     <meta name="description" content="Food bank login page">
     <meta name="frontend author" content="Martin">
-  
+
 </head>
+
 <body>
     <header></header>
     <main>
         <div>
             <section>
-            <img src="resources/logo_placeholder.png">
-            <h1>Food bank log-in</h1>
+                <img src="resources/logo_placeholder2.png">
+                <h1>Food bank log-in</h1>
             </section>
 
-            <form method="post" action="" onsubmit="">
-            <label for="username">Username</label><br>
-            <input type="text" for="username" id="username" required><br>
-            <label for="password">Password</label><br>
-            <input type="password" for="password" id="password" required><br>
-            <label id="message">This section is for registered food banks ONLY. <br> Either contact the developers to regsiter or <a href="">View as a general user</a></label>
-            <label id="failed_message">Username or Password incorrect</label>
-            <input type="submit" value="Login">
+            <form method="post" id="login_section" action="" onsubmit="">
+                <label for="email">Email</label><br>
+                <input type="text" for="email" id="email" required><br>
+                <label for="password">Password</label><br>
+                <input type="password" for="password" id="password" required><br>
+                <label id="message">This section is for registered food banks ONLY. <br> Either contact the developers
+                    to regsiter or <a href="./AllItem.html">View as a general user</a></label>
+                <label id="failed_message">Username or Password incorrect</label>
+                <input type="submit" value="Login">
             </form>
-            
+
         </div>
     </main>
-    <footer></footer>
+    
 </body>
 
 </html>

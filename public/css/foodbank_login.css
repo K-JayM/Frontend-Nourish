@@ -1,10 +1,13 @@
 html, body, main{
-    margin: 0;
+    margin: auto;
     height: 100%;
     background-color: #eeecd4;
     place-content: center;
     font-family:Segoe UI;
 }
+
+
+
 div{display:block;
     margin: auto;
     padding: 0;
@@ -13,7 +16,7 @@ div{display:block;
     border-radius: 10vw;
    background-color: #FFFCD6;
    place-content: center;
-   box-shadow: 10px 10px 20px darkgray;}
+   box-shadow: 1vw 1vw 1vw darkgray;}
 
 div>section{
     position: relative;
@@ -22,6 +25,7 @@ div>section{
     padding: 0;
     width: 50%;
     text-align: center;
+    font-size: 2vh;
 }
    div>section>img{
     position: relative;
@@ -53,7 +57,7 @@ input{
     height: 5vh;
     width: 100%;
     border: 2px solid #3f642a;
-    border-radius: 20px;
+    border-radius: 20vh;
     box-shadow: 3px 3px 2px lightgrey;
     font-size: 2vh;
 }
@@ -87,8 +91,15 @@ input[type=submit]:hover{
     font-weight: bold;
 }
 
+#mobile_navigator{
+    display: none;
+}
+
 @media(max-width: 768px){
 
+    main{
+        height:auto;
+    }
     div{
         display: block;
         height: 100%;
@@ -151,7 +162,56 @@ form{
     
 
 }
+
+    
+    #mobile_navigator{
+        display: flex;
+        justify-content: center;
+        margin: 3vh 0;
+    }
+    #mobile_navigator>a{
+        width: 25%;
+        padding:  0 2%;
+    
+    }
+    #mobile_navigator>a>button{
+        width: 100%;
+        border: 2px solid #3f642a;
+        border-radius: 20vw;
+        background-color: #eeecd4;
+        
+        
+    }
+
+     #mobile_navigator>a>#active, #active>.material-symbols-outlined,#mobile_navigator>a>#active>h6{
+        background-color: #3f642a;
+        color: #eeecd4;
+        
+    }
+
+    .material-symbols-outlined, #mobile_navigator>a>button>h6 {
+        display: block;
+        justify-content: center;
+        padding: 0;
+        margin: 10px;
+        color: #4a5743;
+
+        
 }
+
+    #mobile_navigator>a>button>h6{
+        font-size: 2vw;
+    }
+
+
+
+
+}
+
+
+
+
+
 
 
 
