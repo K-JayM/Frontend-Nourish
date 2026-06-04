@@ -1,0 +1,182 @@
+header { 
+
+    background-color: #2d4a2d; 
+    
+    padding: 15px 30px; 
+    
+    display: flex; 
+    
+    justify-content: space-between; 
+    
+    align-items: center; 
+    
+    } 
+    
+      
+    
+    header h1 { 
+    
+    color: white; 
+    
+    font-size: 28px; 
+    
+    } 
+    
+      
+    
+    nav a { 
+    
+    color: white; 
+    
+    text-decoration: none; 
+    
+    margin-left: 20px; 
+    
+    font-size: 15px; 
+    
+    } 
+    
+      
+    
+    nav a:hover { 
+    
+    text-decoration: underline; 
+    
+    } 
+    
+      
+    
+    nav .admin-btn { 
+    
+    background-color: #6b8c5e; 
+    
+    padding: 6px 14px; 
+    
+    border-radius: 4px; 
+    
+    } 
+    
+     
+    
+ 
+    
+ 
+
+    footer { 
+
+        background-color: #2d4a2d; 
+        
+        color: white; 
+        
+        padding: 20px 30px; 
+        
+        text-align: center; 
+        
+        } 
+        
+          
+        
+        footer nav { 
+        
+        margin-bottom: 10px; 
+        
+        } 
+        
+          
+        
+        footer nav a { 
+        
+        color: white; 
+        
+        text-decoration: none; 
+        
+        margin: 0 15px; 
+        
+        font-size: 14px; 
+        
+        } 
+        
+          
+        
+        footer nav a:hover { 
+        
+        text-decoration: underline; 
+        
+        } 
+        
+          
+        
+        footer p { 
+        
+        font-size: 13px; 
+        
+        color: #a8c4a0; 
+        
+        margin: 0; 
+        
+        } 
+         body {
+    font-family: Arial, sans-serif;
+    background: #f2f8ee;
+    margin: 0;
+    padding: 24px;
+    color: #222;
+  }
+ 
+  h1 {
+    color: #2d6a2d;
+    margin-bottom: 4px;
+  }
+ 
+  p {
+    color: #555;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+ 
+  .controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+ 
+  input[type="text"], select {
+    padding: 8px 10px;
+    border: 1px solid #b0d4a0;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #fff;
+    outline: none;
+  }
+ 
+  input[type="text"] { width: 220px; }
+ 
+  input[type="text"]:focus, select:focus {
+    border-color: #2d6a2d;
+  }
+ 
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #c5deb8;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 14px;
+  }
+ 
+  th {
+    background: #d6eecb;
+    color: #2d6a2d;
+    padding: 11px 14px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 1px solid #c5deb8;
+  }
+ 
+  td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #eaf2e4;
+    color: #333;
+  }
