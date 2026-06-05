@@ -118,3 +118,51 @@ header {
         margin: 0; 
         
         } 
+
+    @media(max-width: 768px){
+
+  body{
+
+    padding: 0;
+    
+  }
+
+          header{
+
+            display: block;
+
+            text-align: center;
+
+            padding: 10% 0;
+
+          }
+          header>*{
+
+            display: inline-block;
+
+          }
+            header>h1{
+
+              margin-bottom: 5vw;
+
+              text-decoration: underline;
+
+              font-size: 6vw;
+
+            }
+
+          header>nav>a, footer>nav>a, footer>p {
+
+            margin: 0 4vw;
+            
+            font-size: 2.5vw;
+
+          }
+
+          footer{
+          
+
+        padding: 3vh 1vw; 
+              
+          }
+        }
