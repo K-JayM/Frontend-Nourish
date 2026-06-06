@@ -30,7 +30,7 @@ h2{
 
 #invHead{
     background-color: #3f642a;
-    width: 60%;
+    width: 95%;
     height: 10%;
     border-radius: 20px 20px 0 0;
     display: flex;
@@ -40,7 +40,6 @@ h2{
 
 .invLine{
     background-color: #8bb574;
-    width: 60%;
     height: 10%;
     border-radius: 20px;
     display: flex;
@@ -75,4 +74,25 @@ label{
     margin: 0 25%;
 }
 
+ul{
+    width: 60%;
+    height: 100%;
+}
 
+ul div{
+    overflow: scroll;
+    width: 95%;
+    height: 80%;
+}
+
+.filterToggles{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.filterToggles input, .filterToggles label{
+    width: auto;
+    margin: 0;
+}
