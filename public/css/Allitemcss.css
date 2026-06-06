@@ -3,10 +3,12 @@
     font-family: Arial, sans-serif;
     background: #f2f8ee;
     margin: 0;
-    padding: 24px;
+    
     color: #222;
   }
- 
+ content{
+ padding: 24px;
+ }
   h1 {
     color: #2d6a2d;
     margin-bottom: 4px;
