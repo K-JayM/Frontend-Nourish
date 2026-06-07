@@ -10,36 +10,33 @@ html, body, main{
 
 main>div{display:block;
     margin: auto;
-    padding: 0;
+    padding: 5vh 0;
     width: 80vw;
-    height: 80vh;
+    height: fit-content;
     border-radius: 10vw;
    background-color: #FFFCD6;
    place-content: center;
    box-shadow: 1vw 1vw 1vw darkgray;}
 
 main>div>section{
-    position: relative;
+   
     float: left;
-    margin: 0;
-    padding: 0;
     width: 50%;
     text-align: center;
     font-size: 2vh;
+
+    
 }
    main>div>section>img{
-    position: relative;
     width: 70%;
-
 }
 
 form{
-    position: relative;
-    right: 5%;
-    top: 15%;
+   
     float: right;
-    padding: 0;
     width: 40%;
+    margin-top: 20vh;
+    margin-right: 5vw;
 }
 
 
@@ -63,21 +60,18 @@ input{
 }
 
 input[type=submit]{
-    width:20%;
+    width:fit-content;
     float: right;
     background-color: #3f642a;
     color: white;
     margin:  2vh 0;
+    padding: 0 2vw;
 }
 input[type=submit]:hover{
     background-color: #345422;
 
 }
 
-#message, #failed_message{
-    font-size: 100%;
-    margin: 5% 0 0 0;
-}
 
 #message>a{
     color: #3f642a;
@@ -85,38 +79,26 @@ input[type=submit]:hover{
     font-weight: bold;
 }
 
-#failed_message{
-    display: none;
-    color: #b11111;
-    font-weight: bold;
-}
+@media(max-width: 1000px){
 
-#mobile_navigator{
-    display: none;
-}
-
-@media(max-width: 768px){
-
-    main{
-        height:auto;
-    }
-    div{
+   
+    main>div{
         display: block;
-        height: 100%;
+        height: fit-content;
         width: 90%;
         place-items: center;
-        margin: auto;
+        
     }
 
-    div>section{
+    main>div>section{
     position: static;
     float: none;
     padding: 0;
     width: 50%;
-    text-align: center;
+    align-content: center;
 }
-       div>section>img{
-    
+
+div>section>img{
     width: 50%;
 
 }
@@ -128,14 +110,16 @@ form{
     float: none;
     padding: 0;
     margin-top: 10vw;
+    margin-right: 0;
     width: 80%;
+    align-content: center;
+    
    
 }
 
-     #message, #failed_message{
-    font-size: 3vw;
-}
+   
  #message{
+     font-size: 3vw;
     margin-top: 10%;
 }
 #message>a{
@@ -150,7 +134,6 @@ form{
     border-radius: 20px;
     box-shadow: 3px 3px 2px lightgrey;
     font-size: 2vh;
-  
 }
     
 
@@ -159,53 +142,8 @@ form{
         width: 50%;
     float: none;
     place-self: center;
-    
-
 }
-
-    
-    #mobile_navigator{
-        display: flex;
-        justify-content: center;
-        margin: 3vh 0;
-    }
-    #mobile_navigator>a{
-        width: 25%;
-        padding:  0 2%;
-    
-    }
-    #mobile_navigator>a>button{
-        width: 100%;
-        border: 2px solid #3f642a;
-        border-radius: 20vw;
-        background-color: #eeecd4;
-        
-        
-    }
-
-     #mobile_navigator>a>#active, #active>.material-symbols-outlined,#mobile_navigator>a>#active>h6{
-        background-color: #3f642a;
-        color: #eeecd4;
-        
-    }
-
-    .material-symbols-outlined, #mobile_navigator>a>button>h6 {
-        display: block;
-        justify-content: center;
-        padding: 0;
-        margin: 10px;
-        color: #4a5743;
-
-        
-}
-
-    #mobile_navigator>a>button>h6{
-        font-size: 2vw;
-    }
-
-
-
-
+   
 }
 
 
