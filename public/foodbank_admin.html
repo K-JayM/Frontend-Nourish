@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Nourish: Food Bank Admin Page</title>
     <link rel="stylesheet" href="css/foodbank_admin.css">
@@ -8,157 +9,182 @@
     <meta name="description" content="Food bank login page">
     <meta name="frontend author" content="Harry">
 
+    <link rel="stylesheet" href="./css/accessibility.css">
+    <script src="./javascript/accessibility.js" defer></script>
+
+
+
 </head>
+
 <body>
-<header>
-    <link rel = "stylesheet" href = "css/bannerfooter.css">
-    <h1>Nourish</h1>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="map.html">Map</a>
-        <a href="AllItem.html">All Food Items</a>
-        <a href="foodbank_login.html" class="admin-btn">Admin Login</a>
-    </nav>
-</header>
+    <header>
+        <link rel="stylesheet" href="css/bannerfooter.css">
+        <h1>Nourish</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="map.html">Map</a>
+            <a href="AllItem.html">All Food Items</a>
+            <a href="foodbank_login.html" class="admin-btn">Admin Login</a>
+        </nav>
+    </header>
 
-<main>
-    <h2>Name of food bank</h2>
-    <section id="sidePanel">
-        <h3>Filters</h3>
-        <form>
-            <label>Food Item:</label>
-            <input type="text">
-            <label>Quantity:</label>
-            <div class="filterToggles">
-                <label><</label>
-                <label>=</label>
-                <label>></label>
-            </div>
-            <div class="filterToggles">
-                <input type="radio" name="quantity">
-                <input type="radio" name="quantity">
-                <input type="radio" name="quantity">
-            </div>
-            <input type="text">
-            <label>Expiry Date:</label>
-            <div class="filterToggles">
-                <label><</label>
-                <label>=</label>
-                <label>></label>
-            </div>
-            <div class="filterToggles">
-                <input type="radio" name="expiry">
-                <input type="radio" name="expiry">
-                <input type="radio" name="expiry">
-            </div>
-            <input type="text">
-            <input type="submit">
-        </form>
-        <h3>Add items</h3>
-        <form>
-            <label>Food Item:</label>
-            <input type="text">
-            <label>Quantity:</label>
-            <input type="text">
-            <label>Expiry Date:</label>
-            <input type="text">
-            <input type="submit">
-        </form>
-    </section>
-    <ul>
-        <section id="invHead">
-            <p>Food Item</p>
-            <p>Quantity</p>
-            <p>Expiry</p>
-            <p>Delete</p>
+    <main>
+        <h2>Name of food bank</h2>
+        <section id="sidePanel">
+            <h3>Filters</h3>
+            <form>
+                <label>Food Item:</label>
+                <input type="text">
+                <label>Quantity:</label>
+                <div class="filterToggles">
+                    <label><</label>
+                            <label>=</label>
+                            <label>></label>
+                </div>
+                <div class="filterToggles">
+                    <input type="radio" name="quantity">
+                    <input type="radio" name="quantity">
+                    <input type="radio" name="quantity">
+                </div>
+                <input type="text">
+                <label>Expiry Date:</label>
+                <div class="filterToggles">
+                    <label><</label>
+                            <label>=</label>
+                            <label>></label>
+                </div>
+                <div class="filterToggles">
+                    <input type="radio" name="expiry">
+                    <input type="radio" name="expiry">
+                    <input type="radio" name="expiry">
+                </div>
+                <input type="text">
+                <input type="submit">
+            </form>
+            <h3>Add items</h3>
+            <form>
+                <label>Food Item:</label>
+                <input type="text">
+                <label>Quantity:</label>
+                <input type="text">
+                <label>Expiry Date:</label>
+                <input type="text">
+                <input type="submit">
+            </form>
         </section>
+        <ul>
+            <section id="invHead">
+                <p>Food Item</p>
+                <p>Quantity</p>
+                <p>Expiry</p>
+                <p>Delete</p>
+            </section>
 
-        <div><! filled from database >
-            <li class="invLine">
-                <p>Apple</p>
-                <p>10</p>
-                <p>2026-01-01</p>
-                <p><button>delete</button></p>
-            </li>
-            <li class="invLine">
-                <p>Bread</p>
-                <p>34</p>
-                <p>2026-01-01</p>
-                <p><button>delete</button></p>
-            </li>
-            <li class="invLine">
-                <p>Tuna</p>
-                <p>2</p>
-                <p>2026-01-01</p>
-                <p><button>delete</button></p>
-            </li>
-            <li class="invLine">
-                <p>Apple</p>
-                <p>10</p>
-                <p>2026-01-01</p>
-                <p><button>delete</button></p>
-            </li>
-            <li class="invLine">
-                <p>Bread</p>
-                <p>34</p>
-                <p>2026-01-01</p>
-                <p><button>delete</button></p>
-            </li>
-            <li class="invLine">
-                <p>Tuna</p>
-                <p>2</p>
-                <p>2026-01-01</p>
-                <p><button>delete</button></p>
-            </li>
-            <li class="invLine">
-                <p>Apple</p>
-                <p>10</p>
-                <p>2026-01-01</p>
-                <p><button>delete</button></p>
-            </li>
-            <li class="invLine">
-                <p>Bread</p>
-                <p>34</p>
-                <p>2026-01-01</p>
-                <p><button>delete</button></p>
-            </li>
-            <li class="invLine">
-                <p>Tuna</p>
-                <p>2</p>
-                <p>2026-01-01</p>
-                <p><button>delete</button></p>
-            </li>
-            <li class="invLine">
-                <p>Apple</p>
-                <p>10</p>
-                <p>2026-01-01</p>
-                <p><button>delete</button></p>
-            </li>
-            <li class="invLine">
-                <p>Bread</p>
-                <p>34</p>
-                <p>2026-01-01</p>
-                <p><button>delete</button></p>
-            </li>
-            <li class="invLine">
-                <p>Tuna</p>
-                <p>2</p>
-                <p>2026-01-01</p>
-                <p><button>delete</button></p>
-            </li>
-        </div>
-    </ul>
-</main>
+            <div>
+                <! filled from database>
+                    <li class="invLine">
+                        <p>Apple</p>
+                        <p>10</p>
+                        <p>2026-01-01</p>
+                        <p><button>delete</button></p>
+                    </li>
+                    <li class="invLine">
+                        <p>Bread</p>
+                        <p>34</p>
+                        <p>2026-01-01</p>
+                        <p><button>delete</button></p>
+                    </li>
+                    <li class="invLine">
+                        <p>Tuna</p>
+                        <p>2</p>
+                        <p>2026-01-01</p>
+                        <p><button>delete</button></p>
+                    </li>
+                    <li class="invLine">
+                        <p>Apple</p>
+                        <p>10</p>
+                        <p>2026-01-01</p>
+                        <p><button>delete</button></p>
+                    </li>
+                    <li class="invLine">
+                        <p>Bread</p>
+                        <p>34</p>
+                        <p>2026-01-01</p>
+                        <p><button>delete</button></p>
+                    </li>
+                    <li class="invLine">
+                        <p>Tuna</p>
+                        <p>2</p>
+                        <p>2026-01-01</p>
+                        <p><button>delete</button></p>
+                    </li>
+                    <li class="invLine">
+                        <p>Apple</p>
+                        <p>10</p>
+                        <p>2026-01-01</p>
+                        <p><button>delete</button></p>
+                    </li>
+                    <li class="invLine">
+                        <p>Bread</p>
+                        <p>34</p>
+                        <p>2026-01-01</p>
+                        <p><button>delete</button></p>
+                    </li>
+                    <li class="invLine">
+                        <p>Tuna</p>
+                        <p>2</p>
+                        <p>2026-01-01</p>
+                        <p><button>delete</button></p>
+                    </li>
+                    <li class="invLine">
+                        <p>Apple</p>
+                        <p>10</p>
+                        <p>2026-01-01</p>
+                        <p><button>delete</button></p>
+                    </li>
+                    <li class="invLine">
+                        <p>Bread</p>
+                        <p>34</p>
+                        <p>2026-01-01</p>
+                        <p><button>delete</button></p>
+                    </li>
+                    <li class="invLine">
+                        <p>Tuna</p>
+                        <p>2</p>
+                        <p>2026-01-01</p>
+                        <p><button>delete</button></p>
+                    </li>
+            </div>
+        </ul>
+    </main>
 
-<footer>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="map.html">Map</a>
-        <a href="AllItem.html">All Food Items</a>
-        <a href="foodbank_login.html">Admin Login</a>
-    </nav>
-    <p> 2026 Nourish. Helping the community of Ladywood</p>
-</footer>
+    <aside id="accessibility">
+      <button id="button_large"><img
+          src="./resources/text_increase_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
+      <button id="button_small"><img
+          src="./resources/text_decrease_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
+      <button id="button_TTS"><img src="./resources/text_to_speech_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
+      <div><button id="button_TTS_backward"><img
+            src="./resources/arrow_back_ios_new_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
+        <button id="button_TTS_pause"><img
+            src="./resources/play_pause_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
+        <button id="button_TTS_play"><img
+            src="./resources/autoplay_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
+        <button id="button_TTS_forward"><img
+            src="./resources/arrow_forward_ios_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
+      </div>
+    </aside>
+
+
+    <footer>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="map.html">Map</a>
+            <a href="AllItem.html">All Food Items</a>
+            <a href="foodbank_login.html">Admin Login</a>
+        </nav>
+        <p> 2026 Nourish. Helping the community of Ladywood</p>
+    </footer>
 </body>
 
 </html>

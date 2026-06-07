@@ -1,0 +1,19 @@
+#accessibility {
+  position: fixed;
+  right: 60px;
+  bottom: 5vw;
+  z-index: 1;
+  width: 2vw;
+
+}
+
+#accessibility>div{
+  display: none;
+
+}
+
+
+#accessibility>button {
+  display: inline-block;
+}
+

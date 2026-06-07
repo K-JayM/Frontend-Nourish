@@ -8,7 +8,7 @@ html, body, main{
 
 
 
-div{display:block;
+main>div{display:block;
     margin: auto;
     padding: 0;
     width: 80vw;
@@ -18,7 +18,7 @@ div{display:block;
    place-content: center;
    box-shadow: 1vw 1vw 1vw darkgray;}
 
-div>section{
+main>div>section{
     position: relative;
     float: left;
     margin: 0;
@@ -27,7 +27,7 @@ div>section{
     text-align: center;
     font-size: 2vh;
 }
-   div>section>img{
+   main>div>section>img{
     position: relative;
     width: 70%;
 
