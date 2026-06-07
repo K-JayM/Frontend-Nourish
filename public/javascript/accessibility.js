@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //TTS
     //1 Select all text elements
-    var children = document.body.querySelectorAll("p, a, h1, h2, h3,label, th, button, input")
+    var children = document.body.querySelectorAll("p, a, h1, h2, h3, label, th, button:not(#accessibility>*), input, span, img:not(#accessibility>button>*)")
 
 
     //2 add TTS button toggle
@@ -68,7 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
     //4 Function to read the TTS requests
     var i = 0;
     function speak(children, x) {
-        var children = document.body.querySelectorAll("p, a, h1, h2, h3,label, th, button, input")
+        children = document.body.querySelectorAll("p, a, h1, h2, h3, label, th, button:not(#accessibility>button), input, span, img:not(#accessibility>button>img)")
+
         speechSynthesis.cancel()
         if (x < 0) {
             x = 0
@@ -85,7 +86,10 @@ document.addEventListener("DOMContentLoaded", () => {
             speak(children, i)
         } else if(children[x].tagName == 'button' || children[x].tagName == "input"){
             var documentText = new SpeechSynthesisUtterance(children[x].value);
-        }else{
+        }else if(children[x].tagName == 'IMG' ){
+            var documentText = new SpeechSynthesisUtterance(children[x].alt)
+        }
+        else{
             var documentText = new SpeechSynthesisUtterance(children[x].textContent);
         }
 
@@ -130,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         reset_background(children)
         speechSynthesis.cancel()
-        children = document.body.querySelectorAll("p, a, h1, h2, h3,label, th, button, input")
+         children = document.body.querySelectorAll("p, a, h1, h2, h3, label, th, button:not(#accessibility>button), input, span, img:not(#accessibility>button>img)")
         i = 0;
         speak(children, i);
 
