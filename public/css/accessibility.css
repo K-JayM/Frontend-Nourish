@@ -17,3 +17,12 @@
   display: inline-block;
 }
 
+@media  (max-width: 768px){
+
+  #accessibility {
+
+  bottom: 10vw;
+
+}
+}
+
