@@ -1,0 +1,31 @@
+{
+  "name": "nourish-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Backend API for the Nourish food availability platform",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test",
+    "supabase": "supabase",
+    "db:reset": "supabase db reset",
+    "db:push": "supabase db push"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.0.0",
+    "@fastify/helmet": "^13.0.0",
+    "@fastify/rate-limit": "^10.0.0",
+    "@fastify/swagger": "^9.0.0",
+    "@fastify/swagger-ui": "^5.0.0",
+    "@supabase/supabase-js": "^2.0.0",
+    "dotenv": "^16.0.0",
+    "fastify": "^5.0.0"
+  },
+  "devDependencies": {
+    "supabase": "^2.105.0"
+  }
+}
