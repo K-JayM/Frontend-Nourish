@@ -1,98 +1,213 @@
-html, body, main{
-    margin: 0;
-    height: 100%;
-    width: 100%;
-    background-color: #eeecd4;
-    font-family:Segoe UI;
-    display: inline-block;
+* {
+  box-sizing: border-box;
 }
 
-h2{
-    background-color: #3f642a;
-    margin: 0;
-    padding: 1% 5%;
+html,
+body {
+  margin: 0;
+  min-height: 100%;
 }
 
-#sidePanel{
-    margin-top: 5px;
-    background-color: #3f642a;
-    width: 30%;
-    height: 100%;
-    right: 0;
-    position: absolute;
-    border-radius: 20px 0 0 20px;
-    color: white;
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #eeecd4;
+  color: #222;
 }
 
-#sidePanel h3{
-    margin: 2%;
+main {
+  width: min(90rem, 100%);
+  margin: 0 auto;
+  padding: 1.5rem;
 }
 
-#invHead{
-    background-color: #3f642a;
-    width: 95%;
-    height: 10%;
-    border-radius: 20px 20px 0 0;
-    display: flex;
-    justify-content: space-evenly;
-    color: white;
+.admin-heading,
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-.invLine{
-    background-color: #8bb574;
-    height: 10%;
-    border-radius: 20px;
-    display: flex;
-    justify-content: space-evenly;
-    margin: 1% 0;
-    color: white;
+.admin-heading h2,
+.section-heading h2 {
+  margin: 0;
+  color: #31511f;
 }
 
-p{
-    width: 15%;
-    text-align: center;
+.admin-heading p {
+  margin: 0.35rem 0 0;
 }
 
-p button{
-    width: 50%;
-    text-align: center;
+.admin-grid {
+  display: grid;
+  grid-template-columns: minmax(17rem, 22rem) minmax(0, 1fr);
+  gap: 1.25rem;
 }
 
-form{
+.side-panel,
+.admin-content {
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.side-panel {
+  align-self: start;
+  border-top: 0.5rem solid #3f642a;
+}
+
+form {
+  display: grid;
+  gap: 0.45rem;
+}
+
+label {
+  margin-top: 0.45rem;
+  font-weight: 700;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #6d8f5b;
+  border-radius: 0.35rem;
+  background: #fff;
+  color: #222;
+  font: inherit;
+}
+
+button {
+  padding: 0.55rem 0.8rem;
+  border: 0;
+  border-radius: 0.35rem;
+  background: #3f642a;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #687268;
+}
+
+button.danger {
+  background: #8b2020;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #235f83;
+  outline-offset: 2px;
+}
+
+.form-actions,
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+}
+
+.filters label {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid #cad8c2;
+  border-radius: 0.5rem;
+}
+
+table {
+  width: 100%;
+  min-width: 52rem;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 0.7rem;
+  border-bottom: 1px solid #dce6d7;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #dcebd4;
+  color: #29451c;
+}
+
+.empty-state {
+  padding: 1.5rem;
+  color: #555;
+  text-align: center;
+}
+
+.reservations-heading {
+  margin-top: 2rem;
+}
+
+.reservation-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0.8rem;
+}
+
+.reservation-card {
+  padding: 1rem;
+  border: 1px solid #b6c9aa;
+  border-radius: 0.5rem;
+  background: #f8fbf5;
+}
+
+.reservation-card h3 {
+  margin: 0 0 0.5rem;
+}
+
+.reservation-card strong {
+  font-family: monospace;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 900px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  main {
+    padding: 1rem;
+  }
+
+  .admin-heading,
+  .section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .filters {
     display: grid;
-}
-
-input{
-    width: 50%;
-    margin: 1% 25%;
-    color: white;
-    background-color: #8bb574;
-    border-color: #3f642a;
-}
-
-label{
-    margin: 0 25%;
-}
-
-ul{
-    width: 60%;
-    height: 100%;
-}
-
-ul div{
-    overflow: scroll;
-    width: 95%;
-    height: 80%;
-}
-
-.filterToggles{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-}
-
-.filterToggles input, .filterToggles label{
-    width: auto;
-    margin: 0;
+    grid-template-columns: 1fr;
+  }
 }

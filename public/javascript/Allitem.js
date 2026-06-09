@@ -1,101 +1,222 @@
-let allItems = [];
-let currentSort = "";
-let currentFilter = "";
- 
+import {
+  apiRequest,
+  ensureAnonymousSession,
+  formatDateTime,
+  setStatus
+} from "./api.js";
 
-function formatDate(dateStr) {
-  if (!dateStr) return "";
-  const [year, month, day] = dateStr.split("-");
-  return `${day}/${month}/${year}`;
+const tableBody = document.getElementById("inventory-table");
+const statusElement = document.getElementById("inventory-status");
+const controls = document.getElementById("inventory-controls");
+const searchInput = document.getElementById("search-items");
+const sortSelect = document.getElementById("sortBy");
+const categorySelect = document.getElementById("category-filter");
+const locationSelect = document.getElementById("location-filter");
+const reservationDialog = document.getElementById("reservation-dialog");
+const reservationForm = document.getElementById("reservation-form");
+const reservationItem = document.getElementById("reservation-item");
+const reservationQuantity = document.getElementById("reservation-quantity");
+const reservationError = document.getElementById("reservation-error");
+const reservationSubmit = document.getElementById("reservation-submit");
+const reservationCancel = document.getElementById("reservation-cancel");
+const reservationResult = document.getElementById("latest-reservation");
+const collectionCode = document.getElementById("collection-code");
+const reservationSummary = document.getElementById("reservation-summary");
+const latestReservationKey = "nourish.latestReservation";
+
+let inventory = [];
+let selectedItem = null;
+
+function compareInventory(left, right) {
+  if (sortSelect.value === "name") return left.name.localeCompare(right.name);
+  if (sortSelect.value === "location") {
+    return left.location.name.localeCompare(right.location.name);
+  }
+  return new Date(left.collect_by) - new Date(right.collect_by);
 }
- 
-function isExpired(dateStr) {
-  if (!dateStr) return false;
-  return new Date(dateStr) < new Date();
+
+function filteredInventory() {
+  const query = searchInput.value.trim().toLowerCase();
+  return inventory
+    .filter((item) => !categorySelect.value || item.category === categorySelect.value)
+    .filter((item) => !locationSelect.value || item.location_id === locationSelect.value)
+    .filter((item) => {
+      if (!query) return true;
+      return [item.name, item.description, item.category, item.location?.name]
+        .filter(Boolean)
+        .some((value) => value.toLowerCase().includes(query));
+    })
+    .sort(compareInventory);
 }
- 
+
+function createCell(text) {
+  const cell = document.createElement("td");
+  cell.textContent = text;
+  return cell;
+}
 
 function renderTable() {
-  const tbody = document.querySelector("table tbody");
-  if (!tbody) return;
- 
-  let data = [...allItems];
- 
-  // Filter by section
-  if (currentFilter) {
-    data = data.filter(item => item.section === currentFilter);
-  }
- 
-  // Sort
-  if (currentSort === "name") {
-    data.sort((a, b) => a.item.localeCompare(b.item));
-  } else if (currentSort === "collectBy") {
-    data.sort((a, b) => new Date(a.date) - new Date(b.date));
-  }
- 
-  tbody.innerHTML = "";
- 
-  if (data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 1rem; color: #888;">No items found.</td></tr>`;
+  tableBody.replaceChildren();
+  const items = filteredInventory();
+
+  if (items.length === 0) {
+    const row = document.createElement("tr");
+    const cell = createCell("No available items match your filters.");
+    cell.colSpan = 6;
+    cell.className = "empty-state";
+    row.append(cell);
+    tableBody.append(row);
     return;
   }
- 
-  data.forEach(item => {
-    const expired = isExpired(item.date);
-    const tr = document.createElement("tr");
-    if (expired) tr.classList.add("expired");
- 
-    tr.innerHTML = `
-      <td>${item.item ?? ""}</td>
-      <td>${item.section ?? ""}</td>
-      <td>${item.location ?? ""}</td>
-      <td>${formatDate(item.date)}</td>
-      <td>${expired ? "Expired" : (item.status ?? "Available")}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
- 
 
-function initControls() {
-  const sortSelect = document.getElementById("sortBy");
-  const allSelects = document.querySelectorAll(".controls select");
-  const sectionSelect = Array.from(allSelects).find(s => s.id !== "sortBy");
- 
-  if (sortSelect) {
-    sortSelect.addEventListener("change", () => {
-      currentSort = sortSelect.value;
-      renderTable();
-    });
-  }
- 
-  if (sectionSelect) {
-    sectionSelect.addEventListener("change", () => {
-      currentFilter = sectionSelect.value;
-      renderTable();
-    });
+  for (const item of items) {
+    const row = document.createElement("tr");
+    row.append(
+      createCell(item.name),
+      createCell(item.category),
+      createCell(item.location?.name ?? "Unknown location"),
+      createCell(formatDateTime(item.collect_by)),
+      createCell(String(item.quantity_available))
+    );
+
+    const actionCell = document.createElement("td");
+    const reserveButton = document.createElement("button");
+    reserveButton.type = "button";
+    reserveButton.className = "reserve-button";
+    reserveButton.textContent = "Reserve";
+    reserveButton.addEventListener("click", () => openReservation(item));
+    actionCell.append(reserveButton);
+    row.append(actionCell);
+    tableBody.append(row);
   }
 }
- 
 
-async function loadData() {
+function populateFilters() {
+  const categories = [...new Set(inventory.map((item) => item.category))].sort();
+  const locations = [
+    ...new Map(
+      inventory
+        .filter((item) => item.location)
+        .map((item) => [item.location.id, item.location])
+    ).values()
+  ].sort((left, right) => left.name.localeCompare(right.name));
+
+  for (const category of categories) {
+    const option = document.createElement("option");
+    option.value = category;
+    option.textContent = category;
+    categorySelect.append(option);
+  }
+
+  for (const location of locations) {
+    const option = document.createElement("option");
+    option.value = location.id;
+    option.textContent = location.name;
+    locationSelect.append(option);
+  }
+}
+
+function openReservation(item) {
+  selectedItem = item;
+  reservationItem.textContent = `${item.name} from ${item.location?.name ?? "the selected location"}`;
+  reservationQuantity.value = "1";
+  reservationQuantity.max = String(item.quantity_available);
+  setStatus(reservationError, "");
+  reservationDialog.showModal();
+  reservationQuantity.focus();
+}
+
+async function submitReservation(event) {
+  event.preventDefault();
+  if (!selectedItem) return;
+
+  const quantity = Number.parseInt(reservationQuantity.value, 10);
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > selectedItem.quantity_available) {
+    setStatus(
+      reservationError,
+      `Enter a quantity between 1 and ${selectedItem.quantity_available}.`,
+      "error"
+    );
+    return;
+  }
+
+  reservationSubmit.disabled = true;
+  setStatus(reservationError, "Creating reservation...");
+
   try {
-    const response = await fetch("data.json");
-    if (!response.ok) throw new Error(`Failed to load JSON: ${response.status}`);
-    allItems = await response.json();
-    renderTable();
-  } catch (err) {
-    console.error("Could not load food data:", err);
-    const tbody = document.querySelector("table tbody");
-    if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 1rem; color: #c00;">Failed to load data. Please try again later.</td></tr>`;
-    }
+    await ensureAnonymousSession();
+    const reservation = await apiRequest("/reservations", {
+      method: "POST",
+      auth: "public",
+      body: {
+        inventoryItemId: selectedItem.id,
+        quantity
+      }
+    });
+
+    collectionCode.textContent = reservation.collection_code;
+    reservationSummary.textContent =
+      `${quantity} × ${selectedItem.name} reserved. ` +
+      `Remaining quantity: ${reservation.remaining_quantity}.`;
+    localStorage.setItem(
+      latestReservationKey,
+      JSON.stringify({
+        code: reservation.collection_code,
+        item: selectedItem.name,
+        quantity
+      })
+    );
+    reservationResult.hidden = false;
+    reservationDialog.close();
+    reservationResult.scrollIntoView({ behavior: "smooth", block: "center" });
+    await loadInventory();
+  } catch (error) {
+    setStatus(reservationError, error.message, "error");
+  } finally {
+    reservationSubmit.disabled = false;
   }
 }
- 
 
-document.addEventListener("DOMContentLoaded", () => {
-  initControls();
-  loadData();
+async function loadInventory() {
+  setStatus(statusElement, "Loading available food...");
+  try {
+    inventory = await apiRequest("/inventory");
+    if (categorySelect.options.length === 1) populateFilters();
+    renderTable();
+    setStatus(
+      statusElement,
+      `${inventory.length} available item${inventory.length === 1 ? "" : "s"} found.`,
+      "success"
+    );
+  } catch (error) {
+    inventory = [];
+    renderTable();
+    setStatus(statusElement, error.message, "error");
+  }
+}
+
+const initialSearch = new URLSearchParams(window.location.search).get("search");
+if (initialSearch) searchInput.value = initialSearch;
+
+try {
+  const latestReservation = JSON.parse(localStorage.getItem(latestReservationKey));
+  if (latestReservation?.code) {
+    collectionCode.textContent = latestReservation.code;
+    reservationSummary.textContent =
+      `${latestReservation.quantity} × ${latestReservation.item} reserved.`;
+    reservationResult.hidden = false;
+  }
+} catch {
+  localStorage.removeItem(latestReservationKey);
+}
+
+controls.addEventListener("input", renderTable);
+controls.addEventListener("change", renderTable);
+reservationForm.addEventListener("submit", submitReservation);
+reservationCancel.addEventListener("click", () => reservationDialog.close());
+reservationDialog.addEventListener("close", () => {
+  selectedItem = null;
+  setStatus(reservationError, "");
 });
 
+loadInventory();

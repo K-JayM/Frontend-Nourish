@@ -1,170 +1,105 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const root = document.documentElement;
+  const accessibility = document.getElementById("accessibility");
+  if (!accessibility) return;
 
-    //Font size adjust
-    const size = ["xx-small", "x-small", "small", "initial", "x-large", "xx-large"]
-    var current_size = 3
+  const controls = accessibility.querySelector(".tts-controls");
+  const smallerButton = document.getElementById("button_small");
+  const largerButton = document.getElementById("button_large");
+  const toggleButton = document.getElementById("button_TTS");
+  const playButton = document.getElementById("button_TTS_play");
+  const pauseButton = document.getElementById("button_TTS_pause");
+  const previousButton = document.getElementById("button_TTS_backward");
+  const nextButton = document.getElementById("button_TTS_forward");
+  const sizes = [80, 90, 100, 115, 130, 145];
+  let sizeIndex = Number.parseInt(localStorage.getItem("nourish.fontSize") ?? "2", 10);
+  let speechIndex = 0;
+  let spokenElements = [];
 
-    const adjust_small = document.querySelector("#button_small")
-    adjust_small.addEventListener("click", () => {
-        let font = document.querySelectorAll("*");
+  if (!Number.isInteger(sizeIndex) || sizeIndex < 0 || sizeIndex >= sizes.length) {
+    sizeIndex = 2;
+  }
 
-        speechSynthesis.cancel()
-        reset_background(children)
-        if (current_size > 0) {
-            current_size -= 1
-            for (i of font) {
+  function applyFontSize() {
+    root.style.fontSize = `${sizes[sizeIndex]}%`;
+    localStorage.setItem("nourish.fontSize", String(sizeIndex));
+  }
 
-                i.style.fontSize = size[current_size]
-
-            }
-        }
-    })
-
-    const adjust_large = document.querySelector("#button_large")
-    adjust_large.addEventListener("click", () => {
-        let font = document.querySelectorAll("*");
-
-        speechSynthesis.cancel()
-        reset_background(children)
-        if (current_size < 5) {
-            current_size += 1
-
-            for (i of font) {
-                i.style.fontSize = size[current_size]
-
-            }
-        }
-    })
-
-
-    //TTS
-    //1 Select all text elements
-    var children = document.body.querySelectorAll("p, a, h1, h2, h3, label, th, button:not(#accessibility button), input, span, img[alt]")
-    console.log(children)
-
-    //2 add TTS button toggle
-    const adjust_TTS = document.querySelector("#button_TTS")
-    adjust_TTS.addEventListener("click", () => {
-        if (document.querySelector("#accessibility>div").style.display == "block") {
-            speechSynthesis.cancel();
-            document.querySelector("#accessibility>div").style.display = "none"
-        } else {
-            document.querySelector("#accessibility>div").style.display = "block"
-        }
-
-    })
-
-    //3 Pause button
-    const adjust_TTS_pause = document.querySelector("#button_TTS_pause")
-    adjust_TTS_pause.addEventListener("click", () => {
-        if (speechSynthesis.paused) {
-            speechSynthesis.resume();
-        } else {
-            speechSynthesis.pause();
-        }
-
-    })
-
-    //4 Function to read the TTS requests
-    var i = 0;
-    function speak(children, x) {
-         children = document.body.querySelectorAll("p,  a, h1, h2, h3, label, th, button:not(#accessibility button, p button), input:not([type='radio']), span, img[alt]")
-        speechSynthesis.cancel()
-        if (x < 0) {
-            x = 0
-            i = 0
-            var documentText = new SpeechSynthesisUtterance(children[x].textContent);
-        } else if (x > children.length - 1) {
-            x = children.length - 1
-            i = children.length - 1
-            return null;
-
-        } else if (children[x].tagName == 'script') {
-
-            i += 1;
-            speak(children, i)
-        } else if (children[x].tagName == 'button' || children[x].tagName == 'INPUT') {
-             var documentText = new SpeechSynthesisUtterance(children[x].value);
-
-        } else if (children[x].tagName == 'IMG') {
-            var documentText = new SpeechSynthesisUtterance(children[x].alt)
-        }
-        else {
-            var documentText = new SpeechSynthesisUtterance(children[x].textContent);
-        }
-
-
-
-        documentText.addEventListener("start", () => {
-            children[x].style.backgroundColor = "yellow";
-            children[x].style.color = "black";
-        });
-
-        documentText.addEventListener("end", () => {
-
-            children[x].style.backgroundColor = "";
-            children[x].style.color = "";
-            i += 1;
-            speak(children, i)
-        });
-
-        documentText.addEventListener("start", () => {
-            children[x].style.backgroundColor = "yellow";
-            children[x].style.color = "black";
-        });
-
-
-        speechSynthesis.speak(documentText);
+  function resetHighlight() {
+    for (const element of spokenElements) {
+      element.classList.remove("tts-speaking");
     }
+  }
 
-    //5 reset all css changes during TTS 
-    function reset_background() {
-        children = document.body.querySelectorAll("p:not(p a), a, h1, h2, h3, label, th, button:not(#accessibility button), input, span, img[alt]")
-        for (x = 0; x < children.length; x++) {
-            children[x].style.backgroundColor = ""
-            children[x].style.color = "";
-        }
+  function collectReadableElements() {
+    return Array.from(
+      document.querySelectorAll(
+        "main h1, main h2, main h3, main p, main label, main th, main td, main a, main button:not(#accessibility button), header a, header h1, footer a, footer p"
+      )
+    ).filter((element) => element.textContent.trim() && !element.hidden);
+  }
 
-
+  function speakAt(index) {
+    if (
+      !("speechSynthesis" in window) ||
+      !("SpeechSynthesisUtterance" in window)
+    ) {
+      return;
     }
+    spokenElements = collectReadableElements();
+    if (spokenElements.length === 0) return;
 
+    speechIndex = Math.max(0, Math.min(index, spokenElements.length - 1));
+    window.speechSynthesis.cancel();
+    resetHighlight();
 
-    //6 play/restart request flow
-    const adjust_TTS_play = document.querySelector("#button_TTS_play")
-    adjust_TTS_play.addEventListener("click", () => {
+    const element = spokenElements[speechIndex];
+    const utterance = new window.SpeechSynthesisUtterance(
+      element.textContent.trim()
+    );
+    utterance.addEventListener("start", () => element.classList.add("tts-speaking"));
+    utterance.addEventListener("end", () => {
+      element.classList.remove("tts-speaking");
+      if (speechIndex < spokenElements.length - 1) {
+        speakAt(speechIndex + 1);
+      }
+    });
+    utterance.addEventListener("error", resetHighlight);
+    window.speechSynthesis.speak(utterance);
+  }
 
-        reset_background(children)
-        speechSynthesis.cancel()
-        i = 0;
-        speak(children, i);
+  smallerButton?.addEventListener("click", () => {
+    sizeIndex = Math.max(0, sizeIndex - 1);
+    applyFontSize();
+  });
 
-    })
+  largerButton?.addEventListener("click", () => {
+    sizeIndex = Math.min(sizes.length - 1, sizeIndex + 1);
+    applyFontSize();
+  });
 
+  toggleButton?.addEventListener("click", () => {
+    if (!controls) return;
+    const isOpen = controls.hidden;
+    controls.hidden = !isOpen;
+    toggleButton.setAttribute("aria-expanded", String(isOpen));
+    if (!isOpen && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      resetHighlight();
+    }
+  });
 
-    //7 goes to the next line
-    const adjust_TTS_forward = document.querySelector("#button_TTS_forward")
-    adjust_TTS_forward.addEventListener("click", () => {
+  playButton?.addEventListener("click", () => speakAt(0));
+  pauseButton?.addEventListener("click", () => {
+    if (!("speechSynthesis" in window)) return;
+    if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+    else window.speechSynthesis.pause();
+  });
+  previousButton?.addEventListener("click", () => speakAt(speechIndex - 1));
+  nextButton?.addEventListener("click", () => speakAt(speechIndex + 1));
 
-        reset_background()
-        speechSynthesis.cancel()
-        i += 1
-        speak(children, i)
-
-    })
-
-    //8 goes to the prev line
-    const adjust_TTS_backward = document.querySelector("#button_TTS_backward")
-    adjust_TTS_backward.addEventListener("click", () => {
-
-        reset_background()
-        speechSynthesis.cancel()
-        i -= 1
-        speak(children, i)
-
-
-    })
-
-
-
-})
-
+  window.addEventListener("beforeunload", () => {
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  });
+  applyFontSize();
+});

@@ -1,80 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nourish</title>
-    <link rel="stylesheet" href="./css/MainPage.css">
-
-     <link rel="stylesheet" href="./css/accessibility.css">
-    <script src="./javascript/accessibility.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Find surplus food available in Ladywood through Nourish.">
+  <title>Nourish</title>
+  <link rel="stylesheet" href="./css/MainPage.css">
+  <link rel="stylesheet" href="./css/accessibility.css">
+  <script src="./javascript/accessibility.js" defer></script>
+  <script type="module" src="./javascript/home.js"></script>
 </head>
 <body>
-
-<header>
-    <a href="/">
-      <img src="./resources/logo_placeholder.png" alt="nourish logo">
+  <header>
+    <a href="./MainPage.html" aria-label="Nourish home">
+      <img src="./resources/logo_placeholder.png" alt="Nourish">
     </a>
 
-    <nav>
-        <a href="login.html">Log In</a>
-        <a href="admin-login">Admin</a>
+    <nav aria-label="Primary navigation">
+      <a href="./AllItem.html">Available food</a>
+      <a href="../Nourish-Map/map.html">Map</a>
+      <a href="./foodbank_login.html">Admin</a>
     </nav>
-</header>
+  </header>
 
-<main>
+  <main>
+    <p id="area">Serving Ladywood &amp; surrounding areas</p>
 
-    <p id="area">
-        Serving Ladywood & surrounding areas
-    </p>
-
-    <h1>
-        Fighting hunger.<br>
-        Zero waste.
-    </h1>
+    <h1>Fighting hunger.<br>Zero waste.</h1>
 
     <p>
-        Nourish connects local businesses with surplus food to volunteers,
-        food banks, and families who need it most — keeping food out of
-        landfill and on people's plates.
+      Nourish connects local businesses with surplus food to volunteers,
+      food banks, and families who need it most, keeping food out of
+      landfill and on people's plates.
     </p>
 
-    <div id="search">
-        <input type="text" placeholder="Search food or location...">
-        <button>Search</button>
+    <form id="search" role="search">
+      <label class="visually-hidden" for="home-search">Search food or location</label>
+      <input
+        id="home-search"
+        name="search"
+        type="search"
+        placeholder="Search food or location..."
+        maxlength="100"
+      >
+      <button type="submit">Search</button>
+    </form>
+
+    <nav class="actions" aria-label="Food availability views">
+      <a class="button" href="../Nourish-Map/map.html">View live map</a>
+      <a class="button" href="../Nourish-Map/map.html#list-view">List locations</a>
+      <a class="button" href="./AllItem.html">All food</a>
+    </nav>
+  </main>
+
+  <aside id="accessibility" aria-label="Accessibility controls">
+    <button id="button_large" type="button" aria-label="Increase text size">
+      <img src="./resources/text_increase_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+    </button>
+    <button id="button_small" type="button" aria-label="Decrease text size">
+      <img src="./resources/text_decrease_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+    </button>
+    <button id="button_TTS" type="button" aria-label="Toggle text-to-speech controls" aria-expanded="false">
+      <img src="./resources/text_to_speech_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+    </button>
+    <div class="tts-controls" hidden>
+      <button id="button_TTS_backward" type="button" aria-label="Read previous item">
+        <img src="./resources/arrow_back_ios_new_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+      </button>
+      <button id="button_TTS_pause" type="button" aria-label="Pause or resume speech">
+        <img src="./resources/play_pause_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+      </button>
+      <button id="button_TTS_play" type="button" aria-label="Read page from beginning">
+        <img src="./resources/autoplay_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+      </button>
+      <button id="button_TTS_forward" type="button" aria-label="Read next item">
+        <img src="./resources/arrow_forward_ios_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+      </button>
     </div>
+  </aside>
 
-    <div>
-        <button onclick="window.location.href='map.html'">
-        View Live Map </button>
-        <button onclick="window.location.href='Listfood.html'">
-        List Food </button> 
-        <button onclick="window.location.href='allitem.html'">
-        All Food </button>
-    </div>
-
-</main>
-
-<aside id="accessibility">
-      <button id="button_large"><img
-          src="./resources/text_increase_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
-      <button id="button_small"><img
-          src="./resources/text_decrease_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
-      <button id="button_TTS"><img src="./resources/text_to_speech_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
-      <div><button id="button_TTS_backward"><img
-            src="./resources/arrow_back_ios_new_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
-        <button id="button_TTS_pause"><img
-            src="./resources/play_pause_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
-        <button id="button_TTS_play"><img
-            src="./resources/autoplay_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
-        <button id="button_TTS_forward"><img
-            src="./resources/arrow_forward_ios_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
-      </div>
-    </aside>
-
-<footer>
-    <p> © 2026 Nourish. Helping the community of Ladywood</p>
-</footer>
-
+  <footer>
+    <p>&copy; 2026 Nourish. Helping the community of Ladywood</p>
+  </footer>
 </body>
 </html>

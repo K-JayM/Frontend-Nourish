@@ -1,160 +1,113 @@
-html, body, main{
-    margin: auto;
-    height: 100%;
-    background-color: #eeecd4;
-    place-content: center;
-    font-family:Segoe UI;
+* {
+  box-sizing: border-box;
 }
 
-
-
-main>div{display:block;
-    margin: auto;
-    padding: 5vh 0;
-    width: 80vw;
-    height: fit-content;
-    border-radius: 10vw;
-   background-color: #FFFCD6;
-   place-content: center;
-   box-shadow: 1vw 1vw 1vw darkgray;}
-
-main>div>section{
-   
-    float: left;
-    width: 50%;
-    text-align: center;
-    font-size: 2vh;
-
-    
-}
-   main>div>section>img{
-    width: 70%;
+html,
+body {
+  margin: 0;
+  min-height: 100%;
 }
 
-form{
-   
-    float: right;
-    width: 40%;
-    margin-top: 20vh;
-    margin-right: 5vw;
+body {
+  min-height: 100vh;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #eeecd4;
 }
 
-
-
-form>label, input{
-    display: block;
-    text-align: center;
-    font-size: 3vh;
-  
- 
+.simple-header {
+  padding: 1rem 1.5rem;
+  background: #3f642a;
 }
 
-
-input{
-    height: 5vh;
-    width: 100%;
-    border: 2px solid #3f642a;
-    border-radius: 20vh;
-    box-shadow: 3px 3px 2px lightgrey;
-    font-size: 2vh;
+.simple-header a {
+  color: #fff;
+  font-weight: 700;
 }
 
-input[type=submit]{
-    width:fit-content;
-    float: right;
-    background-color: #3f642a;
-    color: white;
-    margin:  2vh 0;
-    padding: 0 2vw;
-}
-input[type=submit]:hover{
-    background-color: #345422;
-
+main {
+  display: grid;
+  min-height: calc(100vh - 3.5rem);
+  place-items: center;
+  padding: 2rem 1rem;
 }
 
-
-#message>a{
-    color: #3f642a;
-    text-decoration: none;
-    font-weight: bold;
+.login-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(56rem, 100%);
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background: #fffcd6;
+  box-shadow: 0 1rem 2rem rgb(0 0 0 / 15%);
 }
 
-@media(max-width: 1000px){
-
-   
-    main>div{
-        display: block;
-        height: fit-content;
-        width: 90%;
-        place-items: center;
-        
-    }
-
-    main>div>section{
-    position: static;
-    float: none;
-    padding: 0;
-    width: 50%;
-    align-content: center;
+.login-card > section {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  padding: 2rem;
+  text-align: center;
 }
 
-div>section>img{
-    width: 50%;
-
+.login-card img {
+  width: min(18rem, 80%);
 }
 
-
-
-form{
-    position: static;
-    float: none;
-    padding: 0;
-    margin-top: 10vw;
-    margin-right: 0;
-    width: 80%;
-    align-content: center;
-    
-   
+.login-card form {
+  display: grid;
+  align-content: center;
+  gap: 0.5rem;
+  padding: 2.5rem;
+  background: #fff;
 }
 
-   
- #message{
-     font-size: 3vw;
-    margin-top: 10%;
-}
-#message>a{
-    white-space: pre;
-}
-    
-
-    input{
-    height: 5vh;
-    width: 100%;
-    border: 2px solid #3f642a;
-    border-radius: 20px;
-    box-shadow: 3px 3px 2px lightgrey;
-    font-size: 2vh;
-}
-    
-
-    input[type=submit]{
-        margin: 10% 0;
-        width: 50%;
-    float: none;
-    place-self: center;
-}
-   
+label {
+  margin-top: 0.55rem;
+  font-weight: 700;
 }
 
+input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #3f642a;
+  border-radius: 1.5rem;
+  font: inherit;
+}
 
+button[type="submit"] {
+  justify-self: end;
+  padding: 0.7rem 1.5rem;
+  border: 0;
+  border-radius: 1.5rem;
+  background: #3f642a;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
 
+button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
 
+input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #235f83;
+  outline-offset: 2px;
+}
 
+@media (max-width: 700px) {
+  .login-card {
+    grid-template-columns: 1fr;
+  }
 
+  .login-card > section,
+  .login-card form {
+    padding: 1.5rem;
+  }
 
-
-
-
-
-
-
+  .login-card img {
+    width: 10rem;
+  }
+}

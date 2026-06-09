@@ -1,0 +1,84 @@
+{
+	admin off
+	persist_config off
+	auto_https off
+	log {
+		format json
+	}
+	servers {
+		trusted_proxies static private_ranges 100.0.0.0/8
+	}
+}
+
+:{$PORT:3000} {
+	log {
+		format json
+	}
+	encode gzip
+
+	header {
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+	}
+
+	handle /api/* {
+		reverse_proxy {$BACKEND_URL:http://127.0.0.1:3001}
+	}
+
+	redir / /public/MainPage.html 302
+
+	handle /public/map.html {
+		rewrite * /Nourish-Map/map.html
+		root * .
+		file_server
+	}
+
+	handle /public/Listfood.html {
+		rewrite * /Nourish-Map/map.html
+		root * .
+		file_server
+	}
+
+	handle /public/login.html {
+		rewrite * /public/foodbank_login.html
+		root * .
+		file_server
+	}
+
+	handle /public/admin-login {
+		rewrite * /public/foodbank_login.html
+		root * .
+		file_server
+	}
+
+	handle /public/allitem.html {
+		rewrite * /public/AllItem.html
+		root * .
+		file_server
+	}
+
+	handle /public/index.html {
+		rewrite * /public/MainPage.html
+		root * .
+		file_server
+	}
+
+	handle /public/javascript/AllItems.js {
+		rewrite * /public/javascript/Allitem.js
+		root * .
+		file_server
+	}
+
+	handle /public/* {
+		root * .
+		file_server
+	}
+
+	handle /Nourish-Map/* {
+		root * .
+		file_server
+	}
+
+	respond 404
+}

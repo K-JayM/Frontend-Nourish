@@ -1,10 +1,42 @@
-//just testing it works 
-const login = document.querySelector('#login_section');
-const email = document.querySelector('#email')
-const password = document.querySelector('#password')
-login.addEventListener('submit', async function (event) {
-    event.preventDefault();
-    console.log(password.value, email.value)
+import {
+  apiRequest,
+  getAdminSession,
+  setStatus,
+  signInAdmin
+} from "./api.js";
 
+const form = document.getElementById("login_section");
+const message = document.getElementById("login-message");
+const submitButton = document.getElementById("login-submit");
 
-})
+async function existingSessionIsValid() {
+  if (!getAdminSession()) return false;
+  try {
+    await apiRequest("/admin/inventory", { auth: "admin" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const formData = new FormData(form);
+  submitButton.disabled = true;
+  setStatus(message, "Signing in...");
+
+  try {
+    await signInAdmin(
+      formData.get("email").trim(),
+      formData.get("password")
+    );
+    window.location.replace("./foodbank_admin.html");
+  } catch (error) {
+    setStatus(message, error.message, "error");
+    submitButton.disabled = false;
+  }
+});
+
+if (await existingSessionIsValid()) {
+  window.location.replace("./foodbank_admin.html");
+}

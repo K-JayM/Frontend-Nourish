@@ -1,116 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Nourish: Food Bank Admin Page</title>
-    <link rel="stylesheet" href="css/foodbank_admin.css">
-
-    <meta charset="UTF-8">
-    <meta name="description" content="Food bank login page">
-    <meta name="frontend author" content="Harry">
-
-    <link rel="stylesheet" href="./css/accessibility.css">
-    <script src="./javascript/accessibility.js" defer></script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage Nourish food inventory and reservations.">
+  <title>Admin Dashboard | Nourish</title>
+  <link rel="stylesheet" href="./css/foodbank_admin.css">
+  <link rel="stylesheet" href="./css/bannerfooter.css">
+  <link rel="stylesheet" href="./css/accessibility.css">
+  <script src="./javascript/accessibility.js" defer></script>
+  <script type="module" src="./javascript/foodbank_admin.js"></script>
 </head>
 <body>
-<header>
-    <link rel = "stylesheet" href = "css/bannerfooter.css">
-    <h1>Nourish</h1>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="map.html">Map</a>
-        <a href="AllItem.html">All Food Items</a>
-        <a href="foodbank_login.html" class="admin-btn">Admin Login</a>
+  <header>
+    <h1><a href="./MainPage.html">Nourish</a></h1>
+    <nav aria-label="Admin navigation">
+      <a href="./MainPage.html">Home</a>
+      <a href="../Nourish-Map/map.html">Map</a>
+      <a href="./AllItem.html">Available food</a>
+      <button id="logout-button" type="button" class="admin-btn">Log out</button>
     </nav>
-</header>
+  </header>
 
-<main>
-    <h2>Name of food bank</h2>
-    <section id="sidePanel">
-        <h3>Filters</h3>
-        <form id="form">
-            <label>Food Item:</label>
-            <input name="foodItem" type="text">
-            <label>Quantity:</label>
-            <div class="filterToggles">
-                <label><</label>
-                <label>=</label>
-                <label>></label>
-            </div>
-            <div class="filterToggles">
-                <input type="radio" name="quantitySymbol" value="<">
-                <input type="radio" name="quantitySymbol" value="=" checked="checked">
-                <input type="radio" name="quantitySymbol" value=">">
-            </div>
-            <input name="quantity" type="text">
-            <label>Expiry Date:</label>
-            <div class="filterToggles">
-                <label><</label>
-                <label>=</label>
-                <label>></label>
-            </div>
-            <div class="filterToggles">
-                <input type="radio" name="expirySymbol" value="<">
-                <input type="radio" name="expirySymbol" value="=" checked="checked">
-                <input type="radio" name="expirySymbol" value=">">
-            </div>
-            <input name="date" type="text">
-            <input type="submit" value="Submit">
-        </form>
-        <h3>Add items</h3>
-        <form>
-            <label>Food Item:</label>
-            <input type="text">
-            <label>Quantity:</label>
-            <input type="text">
-            <label>Expiry Date:</label>
-            <input type="text">
-            <input type="submit" value="Submit">
-        </form>
-    </section>
-    <ul>
-        <section id="invHead">
-            <p>Food Item</p>
-            <p>Quantity</p>
-            <p>Expiry</p>
-            <p>Delete</p>
-        </section>
-
-        <div id="list"><! filled from database >
-
-        </div>
-    </ul>
-</main>
-
-<aside id="accessibility">
-      <button id="button_large"><img
-          src="./resources/text_increase_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
-      <button id="button_small"><img
-          src="./resources/text_decrease_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
-      <button id="button_TTS"><img src="./resources/text_to_speech_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
-      <div><button id="button_TTS_backward"><img
-            src="./resources/arrow_back_ios_new_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
-        <button id="button_TTS_pause"><img
-            src="./resources/play_pause_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
-        <button id="button_TTS_play"><img
-            src="./resources/autoplay_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
-        <button id="button_TTS_forward"><img
-            src="./resources/arrow_forward_ios_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg"></button>
+  <main>
+    <div class="admin-heading">
+      <div>
+        <h2>Administration</h2>
+        <p>Manage food availability and collection reservations.</p>
       </div>
-    </aside>
+      <p id="admin-status" class="status-message" role="status" aria-live="polite"></p>
+    </div>
 
-<footer>
-    <nav>
-        <a href="index.html">Home</a>
-        <a href="map.html">Map</a>
-        <a href="AllItem.html">All Food Items</a>
-        <a href="foodbank_login.html">Admin Login</a>
-    </nav>
-    <p> 2026 Nourish. Helping the community of Ladywood</p>
-</footer>
+    <section class="admin-grid" aria-label="Inventory management">
+      <aside class="side-panel" aria-labelledby="inventory-form-title">
+        <h2 id="inventory-form-title">Add inventory</h2>
+        <form id="inventory-form">
+          <input id="inventory-id" name="id" type="hidden">
 
-<script src="javascript/foodbank_admin.js"></script>
+          <label for="inventory-location">Location</label>
+          <select id="inventory-location" name="locationId" required></select>
 
+          <label for="inventory-name">Food item</label>
+          <input id="inventory-name" name="name" type="text" maxlength="160" required>
+
+          <label for="inventory-category">Category</label>
+          <select id="inventory-category" name="category" required>
+            <option value="Hot Food">Hot food</option>
+            <option value="Cold Food">Cold food</option>
+            <option value="Drinks">Drinks</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <label for="inventory-description">Description</label>
+          <textarea id="inventory-description" name="description" maxlength="1000" rows="3"></textarea>
+
+          <label for="inventory-quantity">Available quantity</label>
+          <input id="inventory-quantity" name="quantityAvailable" type="number" min="0" max="1000000" required>
+
+          <label for="inventory-collect-by">Collect by</label>
+          <input id="inventory-collect-by" name="collectBy" type="datetime-local" required>
+
+          <label for="inventory-status">Status</label>
+          <select id="inventory-status" name="status">
+            <option value="available">Available</option>
+            <option value="unavailable">Unavailable</option>
+          </select>
+
+          <div class="form-actions">
+            <button id="inventory-submit" type="submit">Add item</button>
+            <button id="inventory-cancel-edit" type="button" class="secondary" hidden>Cancel edit</button>
+          </div>
+        </form>
+      </aside>
+
+      <section class="admin-content">
+        <div class="section-heading">
+          <h2>Inventory</h2>
+          <div id="inventory-filters" class="filters">
+            <label>
+              Search
+              <input id="admin-search" name="search" type="search" maxlength="100">
+            </label>
+            <label>
+              Status
+              <select id="admin-status-filter" name="status">
+                <option value="">All statuses</option>
+                <option value="available">Available</option>
+                <option value="unavailable">Unavailable</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <caption class="visually-hidden">Inventory managed by Nourish</caption>
+            <thead>
+              <tr>
+                <th scope="col">Food item</th>
+                <th scope="col">Location</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Collect by</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-list"></tbody>
+          </table>
+        </div>
+
+        <div class="section-heading reservations-heading">
+          <h2>Reservations</h2>
+          <label>
+            Status
+            <select id="reservation-status-filter">
+              <option value="">All statuses</option>
+              <option value="held">Held</option>
+              <option value="collected">Collected</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </label>
+        </div>
+        <div id="reservation-list" class="reservation-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <aside id="accessibility" aria-label="Accessibility controls">
+    <button id="button_large" type="button" aria-label="Increase text size">
+      <img src="./resources/text_increase_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+    </button>
+    <button id="button_small" type="button" aria-label="Decrease text size">
+      <img src="./resources/text_decrease_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+    </button>
+    <button id="button_TTS" type="button" aria-label="Toggle text-to-speech controls" aria-expanded="false">
+      <img src="./resources/text_to_speech_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+    </button>
+    <div class="tts-controls" hidden>
+      <button id="button_TTS_backward" type="button" aria-label="Read previous item">
+        <img src="./resources/arrow_back_ios_new_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+      </button>
+      <button id="button_TTS_pause" type="button" aria-label="Pause or resume speech">
+        <img src="./resources/play_pause_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+      </button>
+      <button id="button_TTS_play" type="button" aria-label="Read page from beginning">
+        <img src="./resources/autoplay_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+      </button>
+      <button id="button_TTS_forward" type="button" aria-label="Read next item">
+        <img src="./resources/arrow_forward_ios_35dp_000000_FILL0_wght400_GRAD0_opsz40.svg" alt="">
+      </button>
+    </div>
+  </aside>
 </body>
-
 </html>

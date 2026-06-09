@@ -1,0 +1,8 @@
+.git
+.DS_Store
+backend
+BannerFooter
+accessiblity
+node_modules
+**/node_modules
+

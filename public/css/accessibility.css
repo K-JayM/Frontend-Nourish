@@ -1,28 +1,89 @@
+[hidden] {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 #accessibility {
   position: fixed;
-  right: 60px;
-  bottom: 5vw;
-  z-index: 1;
-  width: 2vw;
-
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
-#accessibility>div{
-  display: none;
-
+#accessibility button {
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0.35rem;
+  border: 2px solid #235f83;
+  border-radius: 0.5rem;
+  background: #fff;
+  cursor: pointer;
 }
 
-
-#accessibility>button {
-  display: inline-block;
+#accessibility button:hover,
+#accessibility button:focus-visible {
+  background: #fef9d9;
+  outline: 3px solid #1a3d2b;
+  outline-offset: 2px;
 }
 
-@media  (max-width: 768px){
+#accessibility img {
+  width: 100%;
+  height: 100%;
+}
 
+#accessibility .tts-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.tts-speaking {
+  color: #000 !important;
+  background: #ffeb3b !important;
+  outline: 2px solid #000;
+}
+
+.status-message {
+  margin: 0.75rem 0;
+  padding: 0.65rem 0.8rem;
+  border-radius: 0.4rem;
+  background: #edf3e8;
+  color: #1a3d2b;
+}
+
+.status-message[data-type="error"] {
+  background: #fde8e8;
+  color: #8b0000;
+}
+
+.status-message[data-type="success"] {
+  background: #e3f3df;
+  color: #24551e;
+}
+
+@media (max-width: 768px) {
   #accessibility {
+    right: 0.5rem;
+    bottom: 0.5rem;
+  }
 
-  bottom: 10vw;
-
+  #accessibility button {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
 }
-}
-

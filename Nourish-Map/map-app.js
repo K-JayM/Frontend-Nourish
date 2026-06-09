@@ -1,134 +1,218 @@
-window.addEventListener('load', () => {
+import { apiRequest, setStatus } from "../public/javascript/api.js";
 
-    //coordinate boundaries for Ladywood Birmingham:
-    const ladywoodCoords = [-1.9182, 52.4813];
-    const webMercatorCoords = ol.proj.fromLonLat(ladywoodCoords);
+const LADYWOOD_COORDINATES = [-1.9182, 52.4813];
+const mapStatus = document.getElementById("map-status");
+const locationCount = document.getElementById("location-count");
+const locationList = document.getElementById("location-list");
+const searchForm = document.getElementById("map-search");
+const searchInput = document.getElementById("map-search-input");
+const mapButton = document.getElementById("btn-map");
+const listButton = document.getElementById("btn-list");
+const mapView = document.getElementById("map-view");
+const listView = document.getElementById("list-view");
 
-    //initlising Open Layers map:
-    const map = new ol.Map({
-        target: 'map',
-        layers: [
-            new ol.layer.Tile({
-                source: new ol.source.OSM()
-            })
-        ],
-        view: new ol.View({
-            center: webMercatorCoords,
-            zoom: 15
-        })
-    });
-    // setting up pin markers for the collection points
-    const markerFeatures = [];
-    const collectionLocations = [
-        { name: "Ladywood Foodbank", lon: -1.9198, lat: 52.4801},
-        { name: "BCG Food Pantry", lon: -1.9262, lat: 52.4851},
-        { name: "Incredible Surplus (Ladywood Hub)", lon: -1.9248, lat: 52.4789},
-        { name: "Birmingham central Foodbank", lon: -1.9103, lat: 52.4828},
-    ];
-
-    const markerStyle = new ol.style.Style({
-        image: new ol.style.Circle({
-            radius: 9,
-            fill: new ol.style.Fill({ color: '#86B070' }),      // Mid Meadow Green center
-            stroke: new ol.style.Stroke({ color: '#235F83', width: 2 }) // Dark Slate Blue border
-        })
-    });
-
-    //looping through each real location & building tracking vector:
-    collectionLocations.forEach(loc => {
-        const feature = new ol.Feature({
-            geometry: new ol.geom.Point(ol.proj.fromLonLat([loc.lon, loc.lat])),
-            name: loc.name
-        });
-        feature.setStyle(markerStyle);
-        markerFeatures.push(feature);
-    });
-
-    const vectorSource = new ol.source.Vector({ features: markerFeatures });
-    const vectorLayer = new ol.layer.Vector({ source: vectorSource });
-    map.addLayer(vectorLayer);
-
-    //Map vs list interactive toggle view
-    const btnMap = document.getElementById('btn-map');
-    const btnList = document.getElementById('btn-list');
-    const mapView = document.getElementById('map-view');
-    const listView = document.getElementById('list-view');
-
-    // Mobile layout
-    if (btnMap && btnList) {
-        btnMap.addEventListener('click', () => {
-            btnMap.classList.add('active');
-            btnList.classList.remove('active');
-            mapView.classList.remove('hidden');
-            listView.classList.add('hidden');
-
-            setTimeout(() => {
-                map.updateSize();
-            }, 50);
-        });
-
-        btnList.addEventListener('click', () => {
-            btnList.classList.add('active');
-            btnMap.classList.remove('active');
-            listView.classList.remove('hidden');
-            mapView.classList.add('hidden');
-        });
-    }
-
-    // laptop & desktop split-screen view:
-  
-    const mapTargetElement = document.getElementById('map');
-    if (mapTargetElement) {
-        const resizeObserver = new ResizeObserver(() => {
-            map.updateSize();
-        });
-        resizeObserver.observe(mapTargetElement);
-    }
-
-    //pop up search engine:
-
-    const searchBtn = document.querySelector('.search-btn');
-
-    if (searchBtn) {
-        searchBtn.addEventListener('click', () => {
-            const userInput = prompt("Enter a location title or resource keyword:", "");
-            if (!userInput || !userInput.trim()) return;
-
-            const query = userInput.toLowerCase().trim();
-
-            // Instantly finds the first matching location array object
-            const matchedLocation = collectionLocations.find(loc => 
-                loc.name.toLowerCase().includes(query)
-            );
-
-            if (matchedLocation) {
-                // finding & highlighting list card when searched
-                const cardHeaders = document.querySelectorAll('.food-card h3');
-                const targetHeader = Array.from(cardHeaders).find(h => 
-                    h.textContent.trim() === matchedLocation.name
-                );
-
-                if (targetHeader) {
-                    const matchedCard = targetHeader.closest('.food-card');
-                    matchedCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-                    // a visual flash notification
-                    matchedCard.style.backgroundColor = '#f9af8c';
-                    setTimeout(() => {
-                        matchedCard.style.backgroundColor = matchedCard.classList.contains('urgent') ? 'var(--accent-cream)' : 'var(--bg-white)';
-                    }, 1200);
-                }
-                    // zoom on map to show what was searched
-                map.getView().animate({
-                    center: ol.proj.fromLonLat([matchedLocation.lon, matchedLocation.lat]),
-                    zoom: 16.5,
-                    duration: 600
-                });
-
-            } else {
-                alert(`No locations found matching "${userInput}".`);
-            }
-        });
-    }
-
+const map = new ol.Map({
+  target: "map",
+  layers: [
+    new ol.layer.Tile({
+      source: new ol.source.OSM()
+    })
+  ],
+  view: new ol.View({
+    center: ol.proj.fromLonLat(LADYWOOD_COORDINATES),
+    zoom: 14
+  })
 });
+
+const markerStyle = new ol.style.Style({
+  image: new ol.style.Circle({
+    radius: 9,
+    fill: new ol.style.Fill({ color: "#86B070" }),
+    stroke: new ol.style.Stroke({ color: "#235F83", width: 2 })
+  })
+});
+const vectorSource = new ol.source.Vector();
+map.addLayer(new ol.layer.Vector({ source: vectorSource }));
+
+let locations = [];
+let inventory = [];
+
+function inventoryForLocation(locationId) {
+  return inventory.filter((item) => item.location_id === locationId);
+}
+
+function switchView(mode) {
+  const showMap = mode === "map";
+  mapButton.classList.toggle("active", showMap);
+  listButton.classList.toggle("active", !showMap);
+  mapButton.setAttribute("aria-pressed", String(showMap));
+  listButton.setAttribute("aria-pressed", String(!showMap));
+  mapView.classList.toggle("hidden", !showMap);
+  listView.classList.toggle("hidden", showMap);
+  if (showMap) window.setTimeout(() => map.updateSize(), 50);
+}
+
+function focusLocation(location) {
+  map.getView().animate({
+    center: ol.proj.fromLonLat([
+      Number(location.longitude),
+      Number(location.latitude)
+    ]),
+    zoom: 16,
+    duration: 500
+  });
+
+  const card = document.querySelector(`[data-location-id="${location.id}"]`);
+  card?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  card?.classList.add("highlight");
+  window.setTimeout(() => card?.classList.remove("highlight"), 1400);
+}
+
+function renderMarkers() {
+  vectorSource.clear();
+  const features = locations.map((location) => {
+    const feature = new ol.Feature({
+      geometry: new ol.geom.Point(
+        ol.proj.fromLonLat([
+          Number(location.longitude),
+          Number(location.latitude)
+        ])
+      ),
+      locationId: location.id
+    });
+    feature.setStyle(markerStyle);
+    return feature;
+  });
+  vectorSource.addFeatures(features);
+}
+
+function appendTextLine(parent, className, text) {
+  const paragraph = document.createElement("p");
+  paragraph.className = className;
+  paragraph.textContent = text;
+  parent.append(paragraph);
+}
+
+function renderLocationCards() {
+  locationList.replaceChildren();
+
+  for (const location of locations) {
+    const locationInventory = inventoryForLocation(location.id);
+    const card = document.createElement("article");
+    card.className = `food-card${location.urgent ? " urgent" : ""}`;
+    card.dataset.locationId = location.id;
+
+    const header = document.createElement("div");
+    header.className = "card-header";
+    const heading = document.createElement("h2");
+    heading.textContent = location.name;
+    header.append(heading);
+
+    if (location.urgent) {
+      const badge = document.createElement("span");
+      badge.className = "badge";
+      badge.textContent = "Urgent support";
+      header.append(badge);
+    }
+
+    card.append(header);
+    appendTextLine(
+      card,
+      "address",
+      `${location.address_line}, ${location.postcode}`
+    );
+    appendTextLine(
+      card,
+      "items",
+      locationInventory.length
+        ? locationInventory
+            .map((item) => `${item.name} (${item.quantity_available})`)
+            .join(", ")
+        : "No food currently listed"
+    );
+    appendTextLine(
+      card,
+      "time",
+      location.opening_info || "Contact the location for opening times"
+    );
+
+    const actions = document.createElement("div");
+    actions.className = "card-actions";
+    const mapLink = document.createElement("button");
+    mapLink.type = "button";
+    mapLink.textContent = "Show on map";
+    mapLink.addEventListener("click", () => {
+      switchView("map");
+      focusLocation(location);
+    });
+    const foodLink = document.createElement("a");
+    foodLink.href = `../public/AllItem.html?search=${encodeURIComponent(location.name)}`;
+    foodLink.textContent = "View food";
+    actions.append(mapLink, foodLink);
+    card.append(actions);
+    locationList.append(card);
+  }
+}
+
+function searchLocations(event) {
+  event.preventDefault();
+  const query = searchInput.value.trim().toLowerCase();
+  if (!query) return;
+
+  const match = locations.find((location) => {
+    const food = inventoryForLocation(location.id);
+    return [
+      location.name,
+      location.address_line,
+      location.postcode,
+      ...food.flatMap((item) => [item.name, item.category, item.description])
+    ]
+      .filter(Boolean)
+      .some((value) => value.toLowerCase().includes(query));
+  });
+
+  if (!match) {
+    setStatus(mapStatus, `No locations or food match "${searchInput.value.trim()}".`, "error");
+    return;
+  }
+
+  setStatus(mapStatus, `Showing ${match.name}.`, "success");
+  focusLocation(match);
+  if (window.matchMedia("(max-width: 767px)").matches) switchView("map");
+}
+
+async function loadMapData() {
+  setStatus(mapStatus, "Loading collection locations...");
+  try {
+    [locations, inventory] = await Promise.all([
+      apiRequest("/locations"),
+      apiRequest("/inventory")
+    ]);
+    renderMarkers();
+    renderLocationCards();
+    locationCount.textContent =
+      `${locations.length} location${locations.length === 1 ? "" : "s"}`;
+    setStatus(mapStatus, "");
+  } catch (error) {
+    locationCount.textContent = "Unavailable";
+    setStatus(mapStatus, error.message, "error");
+  }
+}
+
+map.on("singleclick", (event) => {
+  map.forEachFeatureAtPixel(event.pixel, (feature) => {
+    const location = locations.find((item) => item.id === feature.get("locationId"));
+    if (location) {
+      focusLocation(location);
+      if (window.matchMedia("(max-width: 767px)").matches) switchView("list");
+    }
+  });
+});
+
+new ResizeObserver(() => map.updateSize()).observe(document.getElementById("map"));
+mapButton.addEventListener("click", () => switchView("map"));
+listButton.addEventListener("click", () => switchView("list"));
+searchForm.addEventListener("submit", searchLocations);
+
+if (window.location.hash === "#list-view") switchView("list");
+loadMapData();

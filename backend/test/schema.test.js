@@ -10,6 +10,10 @@ const functionsPath = new URL(
   "../supabase/migrations/202606090002_reservation_functions.sql",
   import.meta.url
 );
+const serviceRoleGrantsPath = new URL(
+  "../supabase/migrations/202606090003_service_role_grants.sql",
+  import.meta.url
+);
 
 test("all application tables enable row level security", async () => {
   const sql = await readFile(schemaPath, "utf8");
@@ -42,3 +46,13 @@ test("reservation functions lock mutable rows and require authenticated roles", 
   );
 });
 
+test("service role can run health checks and verify administrator profiles", async () => {
+  const sql = await readFile(serviceRoleGrantsPath, "utf8");
+
+  assert.match(sql, /grant usage on schema public to service_role;/);
+  assert.match(
+    sql,
+    /grant select on public\.locations, public\.profiles to service_role;/
+  );
+  assert.doesNotMatch(sql, /grant (?:insert|update|delete|all).*service_role;/);
+});

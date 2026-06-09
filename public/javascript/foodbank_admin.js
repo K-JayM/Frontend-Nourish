@@ -1,124 +1,291 @@
-const form = document.getElementById("form");
-const list = document.getElementById("list");
+import {
+  apiRequest,
+  clearAdminSession,
+  formatDateTime,
+  getAdminSession,
+  setStatus
+} from "./api.js";
 
-form.addEventListener("submit", function (event) {
-    event.preventDefault();
+const adminStatus = document.getElementById("admin-status");
+const inventoryForm = document.getElementById("inventory-form");
+const inventoryFormTitle = document.getElementById("inventory-form-title");
+const inventorySubmit = document.getElementById("inventory-submit");
+const cancelEditButton = document.getElementById("inventory-cancel-edit");
+const locationSelect = document.getElementById("inventory-location");
+const inventoryList = document.getElementById("inventory-list");
+const inventoryFilters = document.getElementById("inventory-filters");
+const adminSearch = document.getElementById("admin-search");
+const adminStatusFilter = document.getElementById("admin-status-filter");
+const reservationStatusFilter = document.getElementById("reservation-status-filter");
+const reservationList = document.getElementById("reservation-list");
+const logoutButton = document.getElementById("logout-button");
 
-    const formData = new FormData(form);
+let locations = [];
+let inventory = [];
+let reservations = [];
 
-
-    while (list.hasChildNodes()) {
-        list.removeChild(list.firstChild);
-    }
-
-    fetch('data.json')
-        .then((response) => response.json())
-        .then((json) => populate(json, formData.get("foodItem"), formData.get("quantitySymbol"), formData.get("quantity"), formData.get("expirySymbol"), formData.get("date")));
-});
-
-
-fetch('data.json')
-    .then((response) => response.json())
-    .then((json) => populate(json, "", "=", "", "=", ""));
-
-
-function populate(data, item, quantitySymbol, quantity, dateSymbol, date) {
-
-    if (date != null){
-        var filterDateObject = new Date(date);
-    }else{
-        var filterDateObject = new Date("1970-01-01")
-    }
-
-    for (let i = 0; i < data.length; i++){
-
-        var itemDateObject = new Date(data[i].date);
-
-        if ((data[i].item == item) || (item == "")) {
-            if (quantitySymbol == "<"){
-                if ((parseInt(data[i].quantity) < parseInt(quantity)) || (quantity == "")) {
-
-                    if (dateSymbol == "<") {
-                        if ((date == "") || ((itemDateObject.getTime() - filterDateObject.getTime()) < 0)) {
-                            createInvLine(data[i].item, data[i].quantity, data[i].date)
-                        }
-
-                    } else if (dateSymbol == "=") {
-                        if ((date == "") || ((itemDateObject.getTime() - filterDateObject.getTime()) == 0)) {
-                            createInvLine(data[i].item, data[i].quantity, data[i].date)
-                        }
-
-                    } else if (dateSymbol == ">"){
-                        if ((date == "") || ((itemDateObject.getTime() - filterDateObject.getTime()) > 0)) {
-                            createInvLine(data[i].item, data[i].quantity, data[i].date)
-                        }
-                    }
-                }
-
-            } else if (quantitySymbol == "="){
-                if ((parseInt(data[i].quantity) == parseInt(quantity)) || (quantity == "")) {
-
-                   if (dateSymbol == "<") {
-                        if ((date == "") || ((itemDateObject.getTime() - filterDateObject.getTime()) < 0)) {
-                            createInvLine(data[i].item, data[i].quantity, data[i].date)
-                        }
-
-                   } else if (dateSymbol == "=") {
-                        if ((date == "") || ((itemDateObject.getTime() - filterDateObject.getTime()) == 0)) {
-                            createInvLine(data[i].item, data[i].quantity, data[i].date)
-                        }
-
-                   } else if (dateSymbol == ">"){
-                        if ((date == "") || ((itemDateObject.getTime() - filterDateObject.getTime()) > 0)) {
-                            createInvLine(data[i].item, data[i].quantity, data[i].date)
-                        }
-                   }
-                }
-
-            } else if (quantitySymbol = ">"){
-                if ((parseInt(data[i].quantity) > parseInt(quantity)) || (quantity == "")) {
-                    if (dateSymbol == "<") {
-                        if ((date == "") || ((itemDateObject.getTime() - filterDateObject.getTime()) < 0)) {
-                            createInvLine(data[i].item, data[i].quantity, data[i].date)
-                        }
-
-                    } else if (dateSymbol == "=") {
-                        if ((date == "") || ((itemDateObject.getTime() - filterDateObject.getTime()) == 0)) {
-                            createInvLine(data[i].item, data[i].quantity, data[i].date)
-                        }
-
-                    } else if (dateSymbol == ">"){
-                        if ((date == "") || ((itemDateObject.getTime() - filterDateObject.getTime()) > 0)) {
-                            createInvLine(data[i].item, data[i].quantity, data[i].date)
-                        }
-                    }
-                }
-            }
-        }
-    }
+function requireSession() {
+  if (!getAdminSession()) {
+    window.location.replace("./foodbank_login.html");
+    return false;
+  }
+  return true;
 }
 
-function createInvLine(item, quantity, date){
+function createCell(text) {
+  const cell = document.createElement("td");
+  cell.textContent = text;
+  return cell;
+}
 
-    var listElement = document.createElement("li");
-    listElement.classList.add('invLine');
-    list.appendChild(listElement);
+function filteredInventory() {
+  const query = adminSearch.value.trim().toLowerCase();
+  return inventory.filter((item) => {
+    const matchesStatus = !adminStatusFilter.value || item.status === adminStatusFilter.value;
+    const matchesSearch =
+      !query ||
+      [item.name, item.category, item.description, item.location?.name]
+        .filter(Boolean)
+        .some((value) => value.toLowerCase().includes(query));
+    return matchesStatus && matchesSearch;
+  });
+}
 
-    var para1 = document.createElement("p");
-    var para2 = document.createElement("p");
-    var para3 = document.createElement("p");
-    var para4 = document.createElement("p");
+function renderInventory() {
+  inventoryList.replaceChildren();
+  const items = filteredInventory();
 
-    para1.innerText = item;
-    para2.innerText = quantity;
-    para3.innerText = date;
+  if (items.length === 0) {
+    const row = document.createElement("tr");
+    const cell = createCell("No inventory items match the filters.");
+    cell.colSpan = 6;
+    cell.className = "empty-state";
+    row.append(cell);
+    inventoryList.append(row);
+    return;
+  }
 
-    var button = document.createElement("button");
-    button.innerText = "delete";
-    para4.appendChild(button);
+  for (const item of items) {
+    const row = document.createElement("tr");
+    row.append(
+      createCell(item.name),
+      createCell(item.location?.name ?? "Unknown"),
+      createCell(String(item.quantity_available)),
+      createCell(formatDateTime(item.collect_by)),
+      createCell(item.status)
+    );
 
-    listElement.appendChild(para1);
-    listElement.appendChild(para2);
-    listElement.appendChild(para3);
-    listElement.appendChild(para4);
+    const actions = document.createElement("td");
+    actions.className = "row-actions";
+    const editButton = document.createElement("button");
+    editButton.type = "button";
+    editButton.textContent = "Edit";
+    editButton.addEventListener("click", () => beginEdit(item));
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "danger";
+    deleteButton.textContent = "Delete";
+    deleteButton.addEventListener("click", () => deleteInventory(item));
+
+    actions.append(editButton, deleteButton);
+    row.append(actions);
+    inventoryList.append(row);
+  }
+}
+
+function renderReservations() {
+  reservationList.replaceChildren();
+  const status = reservationStatusFilter.value;
+  const items = reservations.filter((reservation) => !status || reservation.status === status);
+
+  if (items.length === 0) {
+    const message = document.createElement("p");
+    message.className = "empty-state";
+    message.textContent = "No reservations match this status.";
+    reservationList.append(message);
+    return;
+  }
+
+  for (const reservation of items) {
+    const card = document.createElement("article");
+    card.className = "reservation-card";
+    const heading = document.createElement("h3");
+    heading.textContent =
+      reservation.inventory_item?.name ?? "Deleted inventory item";
+    const code = document.createElement("strong");
+    code.textContent = reservation.collection_code;
+    const details = document.createElement("p");
+    details.textContent =
+      `Quantity: ${reservation.quantity} · Status: ${reservation.status} · ` +
+      `Created: ${formatDateTime(reservation.created_at)}`;
+    card.append(heading, code, details);
+
+    if (reservation.status === "held") {
+      const actions = document.createElement("div");
+      actions.className = "row-actions";
+      const collectButton = document.createElement("button");
+      collectButton.type = "button";
+      collectButton.textContent = "Mark collected";
+      collectButton.addEventListener("click", () =>
+        resolveReservation(reservation, "collect")
+      );
+      const cancelButton = document.createElement("button");
+      cancelButton.type = "button";
+      cancelButton.className = "danger";
+      cancelButton.textContent = "Cancel";
+      cancelButton.addEventListener("click", () =>
+        resolveReservation(reservation, "cancel")
+      );
+      actions.append(collectButton, cancelButton);
+      card.append(actions);
+    }
+
+    reservationList.append(card);
+  }
+}
+
+function populateLocations() {
+  locationSelect.replaceChildren();
+  for (const location of locations) {
+    const option = document.createElement("option");
+    option.value = location.id;
+    option.textContent = location.name;
+    locationSelect.append(option);
+  }
+}
+
+function toDateTimeLocal(value) {
+  const date = new Date(value);
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return local.toISOString().slice(0, 16);
+}
+
+function beginEdit(item) {
+  inventoryForm.elements.id.value = item.id;
+  inventoryForm.elements.locationId.value = item.location_id;
+  inventoryForm.elements.name.value = item.name;
+  inventoryForm.elements.category.value = item.category;
+  inventoryForm.elements.description.value = item.description ?? "";
+  inventoryForm.elements.quantityAvailable.value = item.quantity_available;
+  inventoryForm.elements.collectBy.value = toDateTimeLocal(item.collect_by);
+  inventoryForm.elements.status.value = item.status;
+  inventoryFormTitle.textContent = "Edit inventory";
+  inventorySubmit.textContent = "Save changes";
+  cancelEditButton.hidden = false;
+  inventoryForm.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function resetInventoryForm() {
+  inventoryForm.reset();
+  inventoryForm.elements.id.value = "";
+  inventoryFormTitle.textContent = "Add inventory";
+  inventorySubmit.textContent = "Add item";
+  cancelEditButton.hidden = true;
+}
+
+async function saveInventory(event) {
+  event.preventDefault();
+  const data = new FormData(inventoryForm);
+  const id = data.get("id");
+  const payload = {
+    locationId: data.get("locationId"),
+    name: data.get("name").trim(),
+    category: data.get("category"),
+    description: data.get("description").trim() || null,
+    quantityAvailable: Number.parseInt(data.get("quantityAvailable"), 10),
+    collectBy: new Date(data.get("collectBy")).toISOString(),
+    status: data.get("status")
+  };
+
+  inventorySubmit.disabled = true;
+  setStatus(adminStatus, id ? "Saving changes..." : "Adding item...");
+  try {
+    await apiRequest(id ? `/admin/inventory/${id}` : "/admin/inventory", {
+      method: id ? "PATCH" : "POST",
+      auth: "admin",
+      body: payload
+    });
+    resetInventoryForm();
+    await loadDashboard();
+    setStatus(adminStatus, id ? "Inventory updated." : "Inventory added.", "success");
+  } catch (error) {
+    handleAdminError(error);
+  } finally {
+    inventorySubmit.disabled = false;
+  }
+}
+
+async function deleteInventory(item) {
+  if (!window.confirm(`Delete "${item.name}"? This cannot be undone.`)) return;
+  setStatus(adminStatus, `Deleting ${item.name}...`);
+  try {
+    await apiRequest(`/admin/inventory/${item.id}`, {
+      method: "DELETE",
+      auth: "admin"
+    });
+    await loadDashboard();
+    setStatus(adminStatus, "Inventory item deleted.", "success");
+  } catch (error) {
+    handleAdminError(error);
+  }
+}
+
+async function resolveReservation(reservation, action) {
+  const verb = action === "collect" ? "mark as collected" : "cancel";
+  if (!window.confirm(`Are you sure you want to ${verb} ${reservation.collection_code}?`)) {
+    return;
+  }
+
+  setStatus(adminStatus, "Updating reservation...");
+  try {
+    await apiRequest(`/admin/reservations/${reservation.id}/${action}`, {
+      method: "POST",
+      auth: "admin"
+    });
+    await loadDashboard();
+    setStatus(adminStatus, "Reservation updated.", "success");
+  } catch (error) {
+    handleAdminError(error);
+  }
+}
+
+function handleAdminError(error) {
+  if (error.status === 401 || error.status === 403) {
+    clearAdminSession();
+    window.location.replace("./foodbank_login.html");
+    return;
+  }
+  setStatus(adminStatus, error.message, "error");
+}
+
+async function loadDashboard() {
+  try {
+    [locations, inventory, reservations] = await Promise.all([
+      apiRequest("/locations"),
+      apiRequest("/admin/inventory", { auth: "admin" }),
+      apiRequest("/admin/reservations", { auth: "admin" })
+    ]);
+    populateLocations();
+    renderInventory();
+    renderReservations();
+  } catch (error) {
+    handleAdminError(error);
+  }
+}
+
+inventoryForm.addEventListener("submit", saveInventory);
+cancelEditButton.addEventListener("click", resetInventoryForm);
+inventoryFilters.addEventListener("input", renderInventory);
+inventoryFilters.addEventListener("change", renderInventory);
+reservationStatusFilter.addEventListener("change", renderReservations);
+logoutButton.addEventListener("click", () => {
+  clearAdminSession();
+  window.location.replace("./foodbank_login.html");
+});
+
+if (requireSession()) {
+  setStatus(adminStatus, "Loading dashboard...");
+  await loadDashboard();
+  if (getAdminSession()) setStatus(adminStatus, "");
 }

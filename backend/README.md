@@ -1,7 +1,7 @@
 # Nourish Backend
 
-This directory contains the backend only. It does not modify or connect to the
-existing frontend.
+This directory contains the API and Supabase database implementation. The
+static frontend connects to it through the repository-root Caddy proxy.
 
 ## Architecture
 
@@ -131,8 +131,8 @@ cancelled. Cancellation restores stock; collection does not.
 
 ## Railway
 
-Create a Railway service from this repository, set its root directory to
-`/backend`, and set the config-as-code file path to
+Create the backend Railway service from this repository, set its root directory
+to `/backend`, and set the config-as-code file path to
 `/backend/railway.json`. Add:
 
 - `SUPABASE_URL`
@@ -146,12 +146,16 @@ Railway injects `PORT`; do not set it manually. Railpack installs the locked
 npm dependencies, starts with `npm start`, and uses `/health` as its
 healthcheck.
 
+Deploy the frontend as a second service using `/railway.frontend.json` and set
+its `BACKEND_URL` to the backend service's public HTTPS domain. See
+`../RAILWAY_SETUP.md` for the complete deployment sequence.
+
 Use free tiers for development only. Before a public launch, use paid Supabase
 and Railway plans so inactivity pauses and development-tier operational limits
 do not affect availability.
 
 ## Frontend Status
 
-The existing frontend still reads `public/data.json`, uses hard-coded map
-locations, and does not call this API. Connecting it is intentionally excluded
-from this implementation.
+The frontend uses `/api/v1` on its own origin. Caddy serves the static files and
+proxies those requests to the backend, avoiding browser-side backend URLs,
+cross-origin deployment coupling, and exposure of Supabase secrets.
