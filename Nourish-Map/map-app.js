@@ -96,7 +96,7 @@ window.addEventListener('load', () => {
 
             const query = userInput.toLowerCase().trim();
 
-            // 1. Instantly find the first matching location array object
+            // Instantly finds the first matching location array object
             const matchedLocation = collectionLocations.find(loc => 
                 loc.name.toLowerCase().includes(query)
             );
