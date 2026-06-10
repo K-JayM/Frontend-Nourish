@@ -22,12 +22,14 @@
 		X-Frame-Options "DENY"
 	}
 
+	# Keep API calls on the frontend origin and forward them to the Railway backend.
 	handle /api/* {
 		reverse_proxy {$BACKEND_URL:http://127.0.0.1:3001}
 	}
 
 	redir / /public/MainPage.html 302
 
+	# Preserve links used by earlier versions of the static frontend.
 	handle /public/map.html {
 		rewrite * /Nourish-Map/map.html
 		root * .

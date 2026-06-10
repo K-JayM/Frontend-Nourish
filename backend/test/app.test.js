@@ -135,6 +135,52 @@ test("reservation input rejects invalid quantities", async (t) => {
 
   assert.equal(response.statusCode, 400);
   assert.equal(response.json().error.code, "validation_error");
+  assert.equal(response.json().error.message, "quantity must be at least 1");
+});
+
+test("admin login accepts existing passwords shorter than the signup policy", async (t) => {
+  let receivedCredentials;
+  const app = await createApp(
+    fakeService({
+      signInAdmin: async (email, password) => {
+        receivedCredentials = { email, password };
+        return { accessToken: "admin-token" };
+      }
+    })
+  );
+  t.after(() => app.close());
+
+  const response = await app.inject({
+    method: "POST",
+    url: "/api/v1/auth/admin/login",
+    payload: {
+      email: "admin@example.com",
+      password: "short"
+    }
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.deepEqual(receivedCredentials, {
+    email: "admin@example.com",
+    password: "short"
+  });
+});
+
+test("validation errors identify the invalid field", async (t) => {
+  const app = await createApp();
+  t.after(() => app.close());
+
+  const response = await app.inject({
+    method: "POST",
+    url: "/api/v1/auth/admin/login",
+    payload: {
+      email: "not-an-email",
+      password: "password"
+    }
+  });
+
+  assert.equal(response.statusCode, 400);
+  assert.equal(response.json().error.message, "email must be a valid email");
 });
 
 test("reservation creation returns the collection code", async (t) => {

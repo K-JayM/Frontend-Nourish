@@ -1,3 +1,4 @@
+// All browser requests stay on the frontend origin and are proxied by Caddy.
 const API_BASE = "/api/v1";
 const PUBLIC_SESSION_KEY = "nourish.publicSession";
 const ADMIN_SESSION_KEY = "nourish.adminSession";
@@ -32,6 +33,7 @@ function removeSession(storage, key) {
 }
 
 function sessionStore(kind) {
+  // Public reservations survive browser restarts; admin sessions end with the tab.
   if (kind === "admin") {
     return {
       storage: window.sessionStorage,
@@ -48,6 +50,7 @@ function sessionStore(kind) {
 async function parseResponse(response) {
   if (response.status === 204) return null;
 
+  // The API has a stable JSON error contract. Reject proxy or HTML error pages.
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) {
     throw new ApiError(
@@ -59,14 +62,42 @@ async function parseResponse(response) {
 
   const body = await response.json();
   if (!response.ok) {
+    const validationDetail = body.error?.details?.[0];
     throw new ApiError(
       response.status,
       body.error?.code ?? "request_failed",
-      body.error?.message ?? "The request failed",
+      validationErrorMessage(validationDetail) ??
+        body.error?.message ??
+        "The request failed",
       body.error?.details
     );
   }
   return body;
+}
+
+function validationErrorMessage(error) {
+  if (!error) return null;
+
+  const field =
+    error.keyword === "required"
+      ? error.params?.missingProperty
+      : error.keyword === "additionalProperties"
+        ? error.params?.additionalProperty
+        : error.instancePath?.split("/").filter(Boolean).at(-1);
+  const label = field
+    ? field.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase()
+    : "request";
+
+  if (error.keyword === "required") return `${label} is required`;
+  if (error.keyword === "format") return `${label} must be a valid ${error.params?.format}`;
+  if (error.keyword === "minLength") {
+    const limit = error.params?.limit;
+    return `${label} must contain at least ${limit} character${limit === 1 ? "" : "s"}`;
+  }
+  if (error.keyword === "maximum") return `${label} must be no more than ${error.params?.limit}`;
+  if (error.keyword === "minimum") return `${label} must be at least ${error.params?.limit}`;
+  if (error.keyword === "type") return `${label} must be ${error.params?.type}`;
+  return `${label} is invalid`;
 }
 
 async function refreshSession(kind) {
@@ -113,6 +144,7 @@ export async function apiRequest(path, options = {}) {
     body: body === undefined ? undefined : JSON.stringify(body)
   });
 
+  // Retry once with a refreshed token, avoiding an infinite refresh loop.
   if (response.status === 401 && auth && retry) {
     const refreshed = await refreshSession(auth);
     if (refreshed) {
@@ -128,6 +160,7 @@ export async function ensureAnonymousSession() {
   const existing = readSession(storage, key);
   if (existing?.accessToken) return existing;
 
+  // Supabase anonymous users provide ownership without collecting personal data.
   const session = await apiRequest("/auth/anonymous", { method: "POST" });
   return writeSession(storage, key, session);
 }
@@ -168,4 +201,3 @@ export function setStatus(element, message, type = "info") {
   element.dataset.type = type;
   element.hidden = !message;
 }
-

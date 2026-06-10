@@ -1,5 +1,6 @@
 create extension if not exists pgcrypto with schema extensions;
 
+-- Core records shared by the public catalogue and administrator dashboard.
 create table public.locations (
   id uuid primary key default gen_random_uuid(),
   name text not null check (char_length(name) between 1 and 160),
@@ -54,6 +55,7 @@ create table public.reservations (
   )
 );
 
+-- Support the public catalogue filters and administrator reservation queues.
 create index inventory_items_location_id_idx
   on public.inventory_items(location_id);
 create index inventory_items_public_search_idx
@@ -67,6 +69,7 @@ create index reservations_inventory_item_id_idx
 create index reservations_status_idx
   on public.reservations(status);
 
+-- Keep audit timestamps consistent regardless of which client performs an update.
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
@@ -94,6 +97,7 @@ create trigger reservations_set_updated_at
 before update on public.reservations
 for each row execute function public.set_updated_at();
 
+-- Centralize the role check used by row-level security and database functions.
 create or replace function public.is_admin()
 returns boolean
 language sql
@@ -114,6 +118,7 @@ alter table public.inventory_items enable row level security;
 alter table public.profiles enable row level security;
 alter table public.reservations enable row level security;
 
+-- Public users see active locations; administrators may also inspect inactive ones.
 create policy locations_public_read
 on public.locations
 for select
@@ -139,6 +144,7 @@ for delete
 to authenticated
 using ((select public.is_admin()));
 
+-- Expired, empty and unavailable stock never appears in the public catalogue.
 create policy inventory_public_read
 on public.inventory_items
 for select
@@ -189,6 +195,7 @@ for select
 to authenticated
 using (user_id = (select auth.uid()) or (select public.is_admin()));
 
+-- Table grants define possible operations; row-level policies decide permitted rows.
 grant usage on schema public to anon, authenticated;
 grant select on public.locations, public.inventory_items to anon, authenticated;
 grant select on public.profiles, public.reservations to authenticated;

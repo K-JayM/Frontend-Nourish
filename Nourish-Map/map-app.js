@@ -11,6 +11,7 @@ const listButton = document.getElementById("btn-list");
 const mapView = document.getElementById("map-view");
 const listView = document.getElementById("list-view");
 
+// OpenLayers renders Web Mercator coordinates, while the API stores longitude/latitude.
 const map = new ol.Map({
   target: "map",
   layers: [
@@ -49,6 +50,7 @@ function switchView(mode) {
   listButton.setAttribute("aria-pressed", String(!showMap));
   mapView.classList.toggle("hidden", !showMap);
   listView.classList.toggle("hidden", showMap);
+  // A hidden map has no usable dimensions, so recalculate after it becomes visible.
   if (showMap) window.setTimeout(() => map.updateSize(), 50);
 }
 
@@ -98,6 +100,7 @@ function renderLocationCards() {
 
   for (const location of locations) {
     const locationInventory = inventoryForLocation(location.id);
+    // Build cards with textContent so database text is never interpreted as markup.
     const card = document.createElement("article");
     card.className = `food-card${location.urgent ? " urgent" : ""}`;
     card.dataset.locationId = location.id;

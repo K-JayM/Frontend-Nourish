@@ -12,6 +12,7 @@ const submitButton = document.getElementById("login-submit");
 async function existingSessionIsValid() {
   if (!getAdminSession()) return false;
   try {
+    // Verify the stored token and admin role before skipping the login form.
     await apiRequest("/admin/inventory", { auth: "admin" });
     return true;
   } catch {

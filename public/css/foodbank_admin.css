@@ -54,6 +54,7 @@ main {
 }
 
 .side-panel {
+  /* Keep the add/edit form in view while the inventory list scrolls. */
   position: sticky;
   top: 1rem;
   height: max-content;

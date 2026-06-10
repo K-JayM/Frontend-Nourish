@@ -19,6 +19,7 @@ const errorResponse = {
 const protectedRoute = [{ bearerAuth: [] }];
 
 export async function registerRoutes(app, { service }) {
+  // Fastify schemas validate requests and generate the OpenAPI documentation.
   app.get(
     "/",
     {
@@ -134,7 +135,7 @@ export async function registerRoutes(app, { service }) {
           required: ["email", "password"],
           properties: {
             email: { type: "string", format: "email", maxLength: 320 },
-            password: { type: "string", minLength: 8, maxLength: 200 }
+            password: { type: "string", minLength: 1, maxLength: 200 }
           }
         },
         response: {
@@ -432,6 +433,7 @@ function adminReservationActionSchema() {
 }
 
 function toDatabaseInventory(payload) {
+  // The HTTP API uses camelCase while PostgreSQL columns use snake_case.
   const fieldMap = {
     locationId: "location_id",
     quantityAvailable: "quantity_available",

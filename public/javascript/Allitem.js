@@ -35,6 +35,7 @@ function compareInventory(left, right) {
 }
 
 function filteredInventory() {
+  // Filtering remains client-side so the count and table update on every keystroke.
   const query = searchInput.value.trim().toLowerCase();
   return inventory
     .filter((item) => !categorySelect.value || item.category === categorySelect.value)
@@ -114,6 +115,7 @@ function renderTable({ updateStatus = true } = {}) {
 
 function populateFilters() {
   const categories = [...new Set(inventory.map((item) => item.category))].sort();
+  // A map removes duplicate locations returned with separate inventory rows.
   const locations = [
     ...new Map(
       inventory
@@ -165,6 +167,7 @@ async function submitReservation(event) {
   setStatus(reservationError, "Creating reservation...");
 
   try {
+    // The backend requires an authenticated owner for every reservation.
     await ensureAnonymousSession();
     const reservation = await apiRequest("/reservations", {
       method: "POST",
@@ -179,6 +182,7 @@ async function submitReservation(event) {
     reservationSummary.textContent =
       `${quantity} × ${selectedItem.name} reserved. ` +
       `Remaining quantity: ${reservation.remaining_quantity}.`;
+    // Keep the collection code visible if the user reloads the page.
     localStorage.setItem(
       latestReservationKey,
       JSON.stringify({
@@ -215,6 +219,7 @@ const initialSearch = new URLSearchParams(window.location.search).get("search");
 if (initialSearch) searchInput.value = initialSearch;
 
 try {
+  // Restore only the display summary; the server remains the source of truth.
   const latestReservation = JSON.parse(localStorage.getItem(latestReservationKey));
   if (latestReservation?.code) {
     collectionCode.textContent = latestReservation.code;

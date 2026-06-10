@@ -25,6 +25,7 @@ begin
     raise exception 'invalid_quantity';
   end if;
 
+  -- Lock stock before validation so concurrent reservations cannot oversell it.
   select inventory_items.*
   into v_item
   from public.inventory_items
@@ -49,6 +50,7 @@ begin
     raise exception 'insufficient_inventory';
   end if;
 
+  -- Collection codes are random, non-sequential and safe to give to the recipient.
   v_collection_code :=
     'NR-' || upper(substr(encode(extensions.gen_random_bytes(8), 'hex'), 1, 16));
 
@@ -101,6 +103,7 @@ begin
     raise exception 'admin_required';
   end if;
 
+  -- Lock the reservation so it cannot be collected and cancelled concurrently.
   select *
   into v_reservation
   from public.reservations
@@ -142,6 +145,7 @@ begin
     raise exception 'admin_required';
   end if;
 
+  -- Cancellation and stock restoration happen in the same transaction.
   select *
   into v_reservation
   from public.reservations
@@ -178,4 +182,3 @@ revoke all on function public.cancel_reservation(uuid) from public;
 grant execute on function public.reserve_inventory(uuid, integer) to authenticated;
 grant execute on function public.mark_reservation_collected(uuid) to authenticated;
 grant execute on function public.cancel_reservation(uuid) to authenticated;
-

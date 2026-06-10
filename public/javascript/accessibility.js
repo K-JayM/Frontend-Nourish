@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function applyFontSize() {
+    // Scaling the root keeps relative units consistent across every page.
     root.style.fontSize = `${sizes[sizeIndex]}%`;
     localStorage.setItem("nourish.fontSize", String(sizeIndex));
   }
@@ -32,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function collectReadableElements() {
+    // Read semantic content in DOM order and exclude the accessibility toolbar.
     return Array.from(
       document.querySelectorAll(
         "main h1, main h2, main h3, main p, main label, main th, main td, main a, main button:not(#accessibility button), header a, header h1, footer a, footer p"
@@ -60,6 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
     utterance.addEventListener("start", () => element.classList.add("tts-speaking"));
     utterance.addEventListener("end", () => {
       element.classList.remove("tts-speaking");
+      // Continue through the page until the final readable element.
       if (speechIndex < spokenElements.length - 1) {
         speakAt(speechIndex + 1);
       }

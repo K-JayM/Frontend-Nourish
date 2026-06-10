@@ -16,6 +16,7 @@ function parseBoolean(value, fallback) {
 }
 
 export function loadConfig() {
+  // Railway supplies PORT at runtime; 3000 remains the local fallback.
   const port = Number.parseInt(process.env.PORT ?? "3000", 10);
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     throw new AppError(500, "configuration_error", "PORT must be a valid TCP port");
@@ -37,4 +38,3 @@ export function loadConfig() {
     supabaseServiceRoleKey: required("SUPABASE_SERVICE_ROLE_KEY")
   };
 }
-

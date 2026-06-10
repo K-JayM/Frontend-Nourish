@@ -32,7 +32,9 @@ export class SupabaseService {
   constructor(config) {
     this.url = config.supabaseUrl;
     this.anonKey = config.supabaseAnonKey;
+    // Public reads use the anonymous role and remain constrained by RLS.
     this.anon = createClient(this.url, this.anonKey, CLIENT_OPTIONS);
+    // The service role is limited to token verification, health checks and role lookup.
     this.admin = createClient(
       this.url,
       config.supabaseServiceRoleKey,
@@ -41,6 +43,7 @@ export class SupabaseService {
   }
 
   userClient(token) {
+    // Forward the caller's JWT so mutations are evaluated by that user's RLS policies.
     return createClient(this.url, this.anonKey, {
       ...CLIENT_OPTIONS,
       global: {
@@ -61,6 +64,7 @@ export class SupabaseService {
 
   async requireAdmin(token) {
     const user = await this.authenticatedUser(token);
+    // Authentication proves identity; the profiles table grants application roles.
     const { data, error } = await this.admin
       .from("profiles")
       .select("role")
@@ -146,6 +150,7 @@ export class SupabaseService {
 
   async reserveInventory(token, inventoryItemId, quantity) {
     await this.authenticatedUser(token);
+    // The database function locks and updates stock atomically.
     const { data, error } = await this.userClient(token).rpc("reserve_inventory", {
       p_inventory_item_id: inventoryItemId,
       p_quantity: quantity
@@ -239,6 +244,7 @@ export class SupabaseService {
 
   async collectReservation(token, id) {
     await this.requireAdmin(token);
+    // Resolution functions reject repeated actions and preserve reservation state.
     const { data, error } = await this.userClient(token).rpc(
       "mark_reservation_collected",
       { p_reservation_id: id }

@@ -10,6 +10,8 @@ export class AppError extends Error {
 
 export function mapSupabaseError(error) {
   const message = error?.message ?? "Supabase request failed";
+
+  // Translate PostgreSQL constraint codes before handling application RPC errors.
   if (error?.code === "23503") {
     return new AppError(
       409,
@@ -28,6 +30,7 @@ export function mapSupabaseError(error) {
     );
   }
 
+  // Database functions raise stable tokens that are safe to expose as API errors.
   const knownErrors = {
     admin_required: [403, "forbidden", "Administrator access is required"],
     insufficient_inventory: [409, "insufficient_inventory", "Not enough inventory is available"],

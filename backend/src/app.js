@@ -26,6 +26,7 @@ export async function buildApp({ config, service, logger = true }) {
   await app.register(helmet);
   await app.register(cors, {
     origin(origin, callback) {
+      // Requests without an Origin header are server-to-server or health checks.
       if (!origin || config.corsOrigins.includes("*") || config.corsOrigins.includes(origin)) {
         callback(null, true);
         return;
@@ -70,11 +71,12 @@ export async function buildApp({ config, service, logger = true }) {
   });
 
   app.setErrorHandler((error, request, reply) => {
+    // Keep validation and application failures on the same public error shape.
     if (error.validation) {
       reply.code(400).send({
         error: {
           code: "validation_error",
-          message: "Request validation failed",
+          message: validationMessage(error.validation[0]),
           details: error.validation
         }
       });
@@ -104,3 +106,37 @@ export async function buildApp({ config, service, logger = true }) {
   return app;
 }
 
+function validationMessage(error) {
+  if (!error) return "Request validation failed";
+
+  const field =
+    error.keyword === "required"
+      ? error.params.missingProperty
+      : error.keyword === "additionalProperties"
+        ? error.params.additionalProperty
+        : error.instancePath.split("/").filter(Boolean).at(-1);
+  const label = field ? field.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase() : "request";
+
+  switch (error.keyword) {
+    case "required":
+      return `${label} is required`;
+    case "format":
+      return `${label} must be a valid ${error.params.format}`;
+    case "minLength":
+      return `${label} must contain at least ${error.params.limit} character${error.params.limit === 1 ? "" : "s"}`;
+    case "maxLength":
+      return `${label} must contain no more than ${error.params.limit} characters`;
+    case "minimum":
+      return `${label} must be at least ${error.params.limit}`;
+    case "maximum":
+      return `${label} must be no more than ${error.params.limit}`;
+    case "enum":
+      return `${label} must be one of: ${error.params.allowedValues.join(", ")}`;
+    case "type":
+      return `${label} must be ${error.params.type}`;
+    case "additionalProperties":
+      return `${label} is not accepted`;
+    default:
+      return field ? `${label} is invalid` : "Request validation failed";
+  }
+}

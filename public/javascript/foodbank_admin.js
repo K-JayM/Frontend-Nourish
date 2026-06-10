@@ -27,6 +27,7 @@ let inventory = [];
 let reservations = [];
 
 function requireSession() {
+  // This is a usability guard; every admin API route also enforces authorization.
   if (!getAdminSession()) {
     window.location.replace("./foodbank_login.html");
     return false;
@@ -158,6 +159,7 @@ function populateLocations() {
 }
 
 function toDateTimeLocal(value) {
+  // datetime-local expects local wall-clock time rather than a UTC ISO string.
   const date = new Date(value);
   const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
   return local.toISOString().slice(0, 16);
@@ -171,6 +173,7 @@ function beginEdit(item) {
   inventoryForm.elements.description.value = item.description ?? "";
   inventoryForm.elements.quantityAvailable.value = item.quantity_available;
   inventoryForm.elements.collectBy.value = toDateTimeLocal(item.collect_by);
+  // Status is editable only for existing records.
   inventoryStatusSelect.value = item.status;
   inventoryStatusSelect.disabled = false;
   inventoryStatusField.hidden = false;
@@ -183,6 +186,7 @@ function beginEdit(item) {
 function resetInventoryForm() {
   inventoryForm.reset();
   inventoryForm.elements.id.value = "";
+  // Newly created stock always starts available.
   inventoryStatusSelect.value = "available";
   inventoryStatusSelect.disabled = true;
   inventoryStatusField.hidden = true;
@@ -268,6 +272,7 @@ function handleAdminError(error) {
 
 async function loadDashboard() {
   try {
+    // Load independent dashboard sections together to minimize startup time.
     [locations, inventory, reservations] = await Promise.all([
       apiRequest("/locations"),
       apiRequest("/admin/inventory", { auth: "admin" }),

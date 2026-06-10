@@ -6,6 +6,7 @@ const config = loadConfig();
 const service = new SupabaseService(config);
 const app = await buildApp({ config, service });
 
+// Railway sends SIGTERM during deployments; close active connections cleanly.
 const shutdown = async (signal) => {
   app.log.info({ signal }, "Shutting down");
   await app.close();
