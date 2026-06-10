@@ -28,6 +28,7 @@ function fakeService(overrides = {}) {
       status: "held"
     }),
     createInventory: async (_token, payload) => ({ id: "created", ...payload }),
+    listAdminLocations: async () => [],
     listAdminInventory: async () => [],
     updateInventory: async (_token, id, payload) => ({ id, ...payload }),
     deleteInventory: async () => {},
@@ -233,6 +234,72 @@ test("admin inventory payload is converted to database field names", async (t) =
     category: "Cold Food",
     quantity_available: 8,
     collect_by: "2026-06-10T12:00:00.000Z"
+  });
+});
+
+test("admin locations include records available to the authenticated administrator", async (t) => {
+  let receivedToken;
+  const app = await createApp(
+    fakeService({
+      listAdminLocations: async (token) => {
+        receivedToken = token;
+        return [{ id: "location-1", name: "Archived location", active: false }];
+      }
+    })
+  );
+  t.after(() => app.close());
+
+  const response = await app.inject({
+    method: "GET",
+    url: "/api/v1/admin/locations",
+    headers: { authorization: "Bearer admin-token" }
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(receivedToken, "admin-token");
+  assert.equal(response.json()[0].active, false);
+});
+
+test("admin inventory edits accept complete normalised payloads", async (t) => {
+  let receivedUpdate;
+  const app = await createApp(
+    fakeService({
+      updateInventory: async (_token, id, payload) => {
+        receivedUpdate = { id, payload };
+        return { id, ...payload };
+      }
+    })
+  );
+  t.after(() => app.close());
+
+  const id = "20000000-0000-4000-8000-000000000001";
+  const response = await app.inject({
+    method: "PATCH",
+    url: `/api/v1/admin/inventory/${id}`,
+    headers: { authorization: "Bearer admin-token" },
+    payload: {
+      locationId: "10000000-0000-4000-8000-000000000001",
+      name: "Bread",
+      category: "Bakery",
+      description: null,
+      quantityAvailable: 6,
+      collectBy: "2026-06-11T12:00:00.000Z",
+      status: "unavailable"
+    }
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.deepEqual(receivedUpdate, {
+    id,
+    payload: {
+      location_id: "10000000-0000-4000-8000-000000000001",
+      name: "Bread",
+      category: "Bakery",
+      description: null,
+      quantity_available: 6,
+      collect_by: "2026-06-11T12:00:00.000Z",
+      status: "unavailable"
+    }
   });
 });
 

@@ -153,19 +153,30 @@ function populateLocations() {
   for (const location of locations) {
     const option = document.createElement("option");
     option.value = location.id;
-    option.textContent = location.name;
+    option.textContent = location.active ? location.name : `${location.name} (inactive)`;
     locationSelect.append(option);
   }
+}
+
+function preserveSelectValue(select, value, label = value) {
+  if (!value || [...select.options].some((option) => option.value === value)) return;
+  const option = document.createElement("option");
+  option.value = value;
+  option.textContent = label;
+  select.append(option);
 }
 
 function toDateTimeLocal(value) {
   // datetime-local expects local wall-clock time rather than a UTC ISO string.
   const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
   const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
   return local.toISOString().slice(0, 16);
 }
 
 function beginEdit(item) {
+  preserveSelectValue(locationSelect, item.location_id, item.location?.name);
+  preserveSelectValue(inventoryForm.elements.category, item.category);
   inventoryForm.elements.id.value = item.id;
   inventoryForm.elements.locationId.value = item.location_id;
   inventoryForm.elements.name.value = item.name;
@@ -195,23 +206,38 @@ function resetInventoryForm() {
   cancelEditButton.hidden = true;
 }
 
+function inventoryPayload(id) {
+  const quantity = Number(inventoryForm.elements.quantityAvailable.value);
+  const collectBy = new Date(inventoryForm.elements.collectBy.value);
+
+  if (!Number.isInteger(quantity)) {
+    throw new Error("Available quantity must be a whole number.");
+  }
+  if (Number.isNaN(collectBy.getTime())) {
+    throw new Error("Collect by must be a valid date and time.");
+  }
+
+  return {
+    locationId: locationSelect.value,
+    name: inventoryForm.elements.name.value.trim(),
+    category: inventoryForm.elements.category.value,
+    description: inventoryForm.elements.description.value.trim() || null,
+    quantityAvailable: quantity,
+    collectBy: collectBy.toISOString(),
+    status: id ? inventoryStatusSelect.value : "available"
+  };
+}
+
 async function saveInventory(event) {
   event.preventDefault();
-  const data = new FormData(inventoryForm);
-  const id = data.get("id");
-  const payload = {
-    locationId: data.get("locationId"),
-    name: data.get("name").trim(),
-    category: data.get("category"),
-    description: data.get("description").trim() || null,
-    quantityAvailable: Number.parseInt(data.get("quantityAvailable"), 10),
-    collectBy: new Date(data.get("collectBy")).toISOString(),
-    status: id ? data.get("status") : "available"
-  };
+  if (!inventoryForm.reportValidity()) return;
+
+  const id = inventoryForm.elements.id.value.trim();
 
   inventorySubmit.disabled = true;
   setStatus(adminStatus, id ? "Saving changes..." : "Adding item...");
   try {
+    const payload = inventoryPayload(id);
     await apiRequest(id ? `/admin/inventory/${id}` : "/admin/inventory", {
       method: id ? "PATCH" : "POST",
       auth: "admin",
@@ -274,7 +300,7 @@ async function loadDashboard() {
   try {
     // Load independent dashboard sections together to minimize startup time.
     [locations, inventory, reservations] = await Promise.all([
-      apiRequest("/locations"),
+      apiRequest("/admin/locations", { auth: "admin" }),
       apiRequest("/admin/inventory", { auth: "admin" }),
       apiRequest("/admin/reservations", { auth: "admin" })
     ]);

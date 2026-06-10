@@ -185,6 +185,16 @@ export class SupabaseService {
     return data;
   }
 
+  async listAdminLocations(token) {
+    await this.requireAdmin(token);
+    const { data, error } = await this.userClient(token)
+      .from("locations")
+      .select("*")
+      .order("name");
+    if (error) throw mapSupabaseError(error);
+    return data;
+  }
+
   async listAdminInventory(token, filters) {
     await this.requireAdmin(token);
     let query = this.userClient(token)

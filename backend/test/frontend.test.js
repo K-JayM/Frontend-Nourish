@@ -85,7 +85,9 @@ test("new admin inventory is always available until it is edited", async () => {
   assert.match(html, /id="inventory-status" name="status" disabled/);
   assert.match(script, /inventoryStatusField\.hidden = false/);
   assert.match(script, /inventoryStatusField\.hidden = true/);
-  assert.match(script, /status: id \? data\.get\("status"\) : "available"/);
+  assert.match(script, /status: id \? inventoryStatusSelect\.value : "available"/);
+  assert.match(script, /apiRequest\("\/admin\/locations", \{ auth: "admin" \}\)/);
+  assert.match(script, /preserveSelectValue\(inventoryForm\.elements\.category/);
 });
 
 test("admin inventory form remains accessible while scrolling", async () => {

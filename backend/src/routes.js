@@ -248,6 +248,25 @@ export async function registerRoutes(app, { service }) {
   );
 
   app.get(
+    "/api/v1/admin/locations",
+    {
+      schema: {
+        tags: ["Administration"],
+        security: protectedRoute,
+        response: {
+          200: {
+            type: "array",
+            items: { type: "object", additionalProperties: true }
+          },
+          401: errorResponse,
+          403: errorResponse
+        }
+      }
+    },
+    async (request) => service.listAdminLocations(readBearerToken(request))
+  );
+
+  app.get(
     "/api/v1/admin/inventory",
     {
       schema: {
