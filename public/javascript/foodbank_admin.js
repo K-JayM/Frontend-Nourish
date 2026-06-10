@@ -12,6 +12,8 @@ const inventoryFormTitle = document.getElementById("inventory-form-title");
 const inventorySubmit = document.getElementById("inventory-submit");
 const cancelEditButton = document.getElementById("inventory-cancel-edit");
 const locationSelect = document.getElementById("inventory-location");
+const inventoryStatusField = document.getElementById("inventory-status-field");
+const inventoryStatusSelect = document.getElementById("inventory-status");
 const inventoryList = document.getElementById("inventory-list");
 const inventoryFilters = document.getElementById("inventory-filters");
 const adminSearch = document.getElementById("admin-search");
@@ -169,16 +171,21 @@ function beginEdit(item) {
   inventoryForm.elements.description.value = item.description ?? "";
   inventoryForm.elements.quantityAvailable.value = item.quantity_available;
   inventoryForm.elements.collectBy.value = toDateTimeLocal(item.collect_by);
-  inventoryForm.elements.status.value = item.status;
+  inventoryStatusSelect.value = item.status;
+  inventoryStatusSelect.disabled = false;
+  inventoryStatusField.hidden = false;
   inventoryFormTitle.textContent = "Edit inventory";
   inventorySubmit.textContent = "Save changes";
   cancelEditButton.hidden = false;
-  inventoryForm.scrollIntoView({ behavior: "smooth", block: "start" });
+  inventoryForm.elements.name.focus({ preventScroll: true });
 }
 
 function resetInventoryForm() {
   inventoryForm.reset();
   inventoryForm.elements.id.value = "";
+  inventoryStatusSelect.value = "available";
+  inventoryStatusSelect.disabled = true;
+  inventoryStatusField.hidden = true;
   inventoryFormTitle.textContent = "Add inventory";
   inventorySubmit.textContent = "Add item";
   cancelEditButton.hidden = true;
@@ -195,7 +202,7 @@ async function saveInventory(event) {
     description: data.get("description").trim() || null,
     quantityAvailable: Number.parseInt(data.get("quantityAvailable"), 10),
     collectBy: new Date(data.get("collectBy")).toISOString(),
-    status: data.get("status")
+    status: id ? data.get("status") : "available"
   };
 
   inventorySubmit.disabled = true;

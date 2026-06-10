@@ -61,6 +61,51 @@ test("frontend uses the same-origin backend API contract", async () => {
   assert.doesNotMatch(scripts.join("\n"), /SUPABASE_(?:ANON|SERVICE_ROLE)_KEY/);
 });
 
+test("available-food result count follows the filtered inventory", async () => {
+  const script = await readFile(
+    path.join(repositoryRoot, "public/javascript/Allitem.js"),
+    "utf8"
+  );
+
+  assert.match(script, /function updateResultCount\(visibleCount\)/);
+  assert.match(script, /updateResultCount\(items\.length\)/);
+  assert.match(script, /visibleCount === totalCount/);
+});
+
+test("new admin inventory is always available until it is edited", async () => {
+  const [html, script] = await Promise.all([
+    readFile(path.join(repositoryRoot, "public/foodbank_admin.html"), "utf8"),
+    readFile(
+      path.join(repositoryRoot, "public/javascript/foodbank_admin.js"),
+      "utf8"
+    )
+  ]);
+
+  assert.match(html, /id="inventory-status-field" hidden/);
+  assert.match(html, /id="inventory-status" name="status" disabled/);
+  assert.match(script, /inventoryStatusField\.hidden = false/);
+  assert.match(script, /inventoryStatusField\.hidden = true/);
+  assert.match(script, /status: id \? data\.get\("status"\) : "available"/);
+});
+
+test("admin inventory form remains accessible while scrolling", async () => {
+  const [styles, script] = await Promise.all([
+    readFile(
+      path.join(repositoryRoot, "public/css/foodbank_admin.css"),
+      "utf8"
+    ),
+    readFile(
+      path.join(repositoryRoot, "public/javascript/foodbank_admin.js"),
+      "utf8"
+    )
+  ]);
+
+  assert.match(styles, /\.side-panel\s*\{[^}]*position: sticky;/s);
+  assert.match(styles, /max-height: calc\(100vh - 2rem\);/);
+  assert.match(styles, /@media \(max-width: 900px\)[\s\S]*position: static;/);
+  assert.doesNotMatch(script, /inventoryForm\.scrollIntoView/);
+});
+
 test("Railway frontend serves static files and proxies API traffic", async () => {
   const [caddyfile, railwayConfig, dockerfile] = await Promise.all([
     readFile(path.join(repositoryRoot, "Caddyfile"), "utf8"),
@@ -75,4 +120,3 @@ test("Railway frontend serves static files and proxies API traffic", async () =>
   assert.equal(config.build.dockerfilePath, "Dockerfile.frontend");
   assert.match(dockerfile, /FROM caddy:/);
 });
-

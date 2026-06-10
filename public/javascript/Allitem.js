@@ -7,7 +7,6 @@ import {
 
 const tableBody = document.getElementById("inventory-table");
 const statusElement = document.getElementById("inventory-status");
-const controls = document.getElementById("inventory-controls");
 const searchInput = document.getElementById("search-items");
 const sortSelect = document.getElementById("sortBy");
 const categorySelect = document.getElementById("category-filter");
@@ -55,9 +54,31 @@ function createCell(text) {
   return cell;
 }
 
-function renderTable() {
+function updateResultCount(visibleCount) {
+  const totalCount = inventory.length;
+
+  if (visibleCount === 0) {
+    const message =
+      totalCount === 0
+        ? "No available items found."
+        : `0 of ${totalCount} available items found.`;
+    setStatus(statusElement, message, "info");
+    return;
+  }
+
+  const visibleLabel = `${visibleCount} available item${visibleCount === 1 ? "" : "s"}`;
+  const message =
+    visibleCount === totalCount
+      ? `${visibleLabel} found.`
+      : `${visibleLabel} found out of ${totalCount}.`;
+  setStatus(statusElement, message, "success");
+}
+
+function renderTable({ updateStatus = true } = {}) {
   tableBody.replaceChildren();
   const items = filteredInventory();
+
+  if (updateStatus) updateResultCount(items.length);
 
   if (items.length === 0) {
     const row = document.createElement("tr");
@@ -183,14 +204,9 @@ async function loadInventory() {
     inventory = await apiRequest("/inventory");
     if (categorySelect.options.length === 1) populateFilters();
     renderTable();
-    setStatus(
-      statusElement,
-      `${inventory.length} available item${inventory.length === 1 ? "" : "s"} found.`,
-      "success"
-    );
   } catch (error) {
     inventory = [];
-    renderTable();
+    renderTable({ updateStatus: false });
     setStatus(statusElement, error.message, "error");
   }
 }
@@ -210,8 +226,10 @@ try {
   localStorage.removeItem(latestReservationKey);
 }
 
-controls.addEventListener("input", renderTable);
-controls.addEventListener("change", renderTable);
+searchInput.addEventListener("input", renderTable);
+sortSelect.addEventListener("change", renderTable);
+categorySelect.addEventListener("change", renderTable);
+locationSelect.addEventListener("change", renderTable);
 reservationForm.addEventListener("submit", submitReservation);
 reservationCancel.addEventListener("click", () => reservationDialog.close());
 reservationDialog.addEventListener("close", () => {

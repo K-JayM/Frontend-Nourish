@@ -60,11 +60,13 @@
           <label for="inventory-collect-by">Collect by</label>
           <input id="inventory-collect-by" name="collectBy" type="datetime-local" required>
 
-          <label for="inventory-status">Status</label>
-          <select id="inventory-status" name="status">
-            <option value="available">Available</option>
-            <option value="unavailable">Unavailable</option>
-          </select>
+          <div id="inventory-status-field" hidden>
+            <label for="inventory-status">Status</label>
+            <select id="inventory-status" name="status" disabled>
+              <option value="available">Available</option>
+              <option value="unavailable">Unavailable</option>
+            </select>
+          </div>
 
           <div class="form-actions">
             <button id="inventory-submit" type="submit">Add item</button>

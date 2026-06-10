@@ -54,6 +54,10 @@ main {
 
 .side-panel {
   align-self: start;
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
   border-top: 0.5rem solid #3f642a;
 }
 
@@ -192,6 +196,12 @@ th {
 @media (max-width: 900px) {
   .admin-grid {
     grid-template-columns: 1fr;
+  }
+
+  .side-panel {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
   }
 }
 
