@@ -28,7 +28,6 @@
         <h2>Administration</h2>
         <p>Manage food availability and collection reservations.</p>
       </div>
-      <p id="admin-status" class="status-message" role="status" aria-live="polite"></p>
     </div>
 
     <section class="admin-grid" aria-label="Inventory management">
@@ -67,6 +66,8 @@
               <option value="unavailable">Unavailable</option>
             </select>
           </div>
+
+          <p id="admin-status" class="status-message form-status" role="status" aria-live="polite"></p>
 
           <div class="form-actions">
             <button id="inventory-submit" type="submit">Add item</button>

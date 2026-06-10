@@ -66,6 +66,10 @@ form {
   gap: 0.45rem;
 }
 
+.form-status {
+  margin: 0.75rem 0 0;
+}
+
 label {
   margin-top: 0.45rem;
   font-weight: 700;

@@ -91,7 +91,8 @@ test("new admin inventory is always available until it is edited", async () => {
 });
 
 test("admin inventory form remains accessible while scrolling", async () => {
-  const [styles, script] = await Promise.all([
+  const [html, styles, script] = await Promise.all([
+    readFile(path.join(repositoryRoot, "public/foodbank_admin.html"), "utf8"),
     readFile(
       path.join(repositoryRoot, "public/css/foodbank_admin.css"),
       "utf8"
@@ -108,6 +109,15 @@ test("admin inventory form remains accessible while scrolling", async () => {
   assert.doesNotMatch(styles, /\.side-panel\s*\{[^}]*overflow-y: auto;/s);
   assert.match(styles, /@media \(max-width: 760px\)[\s\S]*position: static;/);
   assert.doesNotMatch(script, /inventoryForm\.scrollIntoView/);
+  assert.match(
+    html,
+    /<form id="inventory-form">[\s\S]*id="admin-status"[\s\S]*class="form-actions"/
+  );
+  const heading = html.slice(
+    html.indexOf('<div class="admin-heading">'),
+    html.indexOf('<section class="admin-grid"')
+  );
+  assert.doesNotMatch(heading, /id="admin-status"/);
 });
 
 test("Railway frontend serves static files and proxies API traffic", async () => {
