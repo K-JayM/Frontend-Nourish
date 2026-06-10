@@ -100,9 +100,11 @@ test("admin inventory form remains accessible while scrolling", async () => {
     )
   ]);
 
+  assert.match(styles, /\.admin-grid\s*\{[^}]*align-items: start;/s);
   assert.match(styles, /\.side-panel\s*\{[^}]*position: sticky;/s);
-  assert.match(styles, /max-height: calc\(100vh - 2rem\);/);
-  assert.match(styles, /@media \(max-width: 900px\)[\s\S]*position: static;/);
+  assert.match(styles, /\.side-panel\s*\{[^}]*top: 1rem;/s);
+  assert.doesNotMatch(styles, /\.side-panel\s*\{[^}]*overflow-y: auto;/s);
+  assert.match(styles, /@media \(max-width: 760px\)[\s\S]*position: static;/);
   assert.doesNotMatch(script, /inventoryForm\.scrollIntoView/);
 });
 
